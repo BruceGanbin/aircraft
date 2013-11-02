@@ -27,10 +27,11 @@ int main(void)
 
   while(1)
   {
-
+	 
 
   }
-  return (0);
+	
+//  return 0;
 } 
 
 /***************************************************************************************************
@@ -39,17 +40,4 @@ int main(void)
 **************************************************************************************************
 ***************************************************************************************************/
 
-void App_TaskStart(void *p_arg)
-{
-  
-  while(USART_GetFlagStatus(USART2, USART_FLAG_TC)==RESET){};
-  USART_SendData(USART2,'A');
-  while(USART_GetFlagStatus(USART2, USART_FLAG_TC)==RESET){};
-  USART_SendData(USART2,'T');
 
-  while(1)
-  {
-	 USART_SendData(USART2,0x55);
-
-  }
-}
