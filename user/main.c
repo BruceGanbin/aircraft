@@ -1,5 +1,5 @@
 #include "includes.h"
-
+#include "string.h"
 
 
 
@@ -15,7 +15,11 @@
 int main(void)
 {
   u16 Init_error=0x00;
-
+  char AT_c[20]="AT+";
+  char BT_c[5];
+  u8 ST=0;
+  char *pAT;
+  pAT=AT_c;
   Init_error=RCC_Configuration();
   while(!Init_error)
   {}
@@ -24,7 +28,9 @@ int main(void)
   Usart_Configuration();
   TIME_Configuration();
   IIC_Configuration();
-
+  pAT=strcat(pAT,"BAUD");
+  ST=strcmp("OK+",strncpy(BT_c,"OK+Set",3));
+	while(ST){};
   while(1)
   {
 	 

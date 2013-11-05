@@ -8,7 +8,7 @@
  @Peremater    :
  @Brief        :
 ***************************************************/
-void Usart_Send(u8 SendNumber)
+void Usart_Send(u8 pBuffer,u16 SendNumber)
 { 
 // 需要设置发送完成标志（未设）  
 if(USART_GetFlagStatus(USART1,USART_FLAG_TC) == SET)
@@ -17,7 +17,7 @@ if(USART_GetFlagStatus(USART1,USART_FLAG_TC) == SET)
 	 DMA_ClearFlag(DMA1_FLAG_TC4);
 	 USART_ClearFlag(USART1,USART_FLAG_TC);
 	 DMA1_Channel4->CNDTR =SendNumber;
-	 DMA1_Channel4->CMAR=(u32)USART_Tbuffer;
+	 DMA1_Channel4->CMAR=(u32)pBuffer;
 	 DMA_Cmd(DMA1_Channel4,ENABLE);
   }
 }
