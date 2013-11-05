@@ -5,43 +5,52 @@
 extern "C" {
 #endif
 
+#include <string.h>
+
 typedef unsigned char u8;
 typedef unsigned short int u16;
 typedef unsigned int u32;
 
-#define BAUD_1200             '1'
-#define BAUD_2400             '2'
-#define BAUD_4800             '3'
-#define BAUD_9600             '4'
-#define BAUD_19200            '5'
-#define BAUD_38400            '6'
-#define BAUD_57600            '7'
-#define BAUD_115200           '8'
-#define BAUD_230400           '9'
-#define BAUD_460800           'A'
-#define BAUD_921600           'B'
-#define BAUD_1382400          'C'
+#define BAUD_1200             "BAUD1"
+#define BAUD_2400             "BAUD2"
+#define BAUD_4800             "BAUD3"
+#define BAUD_9600             "BAUD4"
+#define BAUD_19200            "BAUD5"
+#define BAUD_38400            "BAUD6"
+#define BAUD_57600            "BAUD7"
+#define BAUD_115200           "BAUD8"
+#define BAUD_230400           "BAUD9"
+#define BAUD_460800           "BAUDA"
+#define BAUD_921600           "BAUDB"
+#define BAUD_1382400          "BAUDC"
+
+#define TIMEOUT                6000
 
 
 typedef struct BLUETOOTH_INIT_
 {
-  u8 BT_Baud;
-  u8 BT_CHK;
-  u8 BT_StopBit;
-  u8 *BT_Name;
-  u8 BT_AUTH;
-  u8 *BT_PIN;
+  char *BT_Name;
+  char *BT_Auth;
+  char *BT_PIN;
+  char *BT_Baud;
+  char *BT_Chk;
+  char *BT_StopBit;
 
+  u8    BT_State;
 
-  void (*Serial_SendData)(u8 *Data,u16 Num);
+  char *(*BT_ReadData)(void);
+  void (*BT_SendData)(u8 *pData,u32 Num);
 }BT_InitTypedef;
 
   void BT_SendData(char *Data);
-  void BT_Init();
+  void BT_ReadData(void);
+
+  u8   BT_Init(BT_InitTypedef *BT_Config);
   u8   BT_Set();
   u8   BT_RState();
   u8   BT_MasterInit();
   u8   BT_SlaveInit();
+  u8   BT_GetStater();
   u8   BT_CMD();
   
 
