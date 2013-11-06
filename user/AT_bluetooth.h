@@ -36,20 +36,36 @@ typedef struct BLUETOOTH_INIT_
   char *BT_Chk;
   char *BT_StopBit;
 
+  BT_MasterTypedef *BT_Master;
+  BT_SlaveTypedef  *BT_Slave;
   u8    BT_State;
 
   char *(*BT_ReadData)(void);
   void (*BT_SendData)(u8 *pData,u32 Num);
 }BT_InitTypedef;
 
-  void BT_SendData(char *Data);
-  void BT_ReadData(void);
+
+ typedef struct BT_MASTERINIT_
+{
+
+
+}BT_MasterTypedef;
+
+typedef struct BT_SLAVEINIT_
+{
+
+
+}BT_SlaveTypedef;
+
+extern void BT_SendData(char *Data);
+extern void BT_ReadData(void);
 
   u8   BT_Init(BT_InitTypedef *BT_Config);
+  u8   BT_MasterInit(BT_InitTypedef *BT_Config);
+  u8   BT_SlaveInit(BT_InitTypedef *BT_Config);
+
   u8   BT_Set();
   u8   BT_RState();
-  u8   BT_MasterInit();
-  u8   BT_SlaveInit();
   u8   BT_GetStater();
   u8   BT_CMD();
   

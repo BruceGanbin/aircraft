@@ -17,10 +17,12 @@ void BT_SendData(char *pData)
   Serial_SendData(pData,Num);
 }
 
+
 char *BT_ReadData(void)
 {
   return Serial_ReadData();
 }
+
 
 
 void (*Serial_SendData)(char *Data,u8 Num)=0;
@@ -32,6 +34,7 @@ u8 BT_Init(BT_InitTypedef *BT_Config)
   char AT_cmd[20]="AT+";
   char Empty[5];
   u16 OverTime=0;
+  u32 Count=0;
   char *pAT;
 
   //init BT_SendData();
@@ -125,16 +128,31 @@ u8 BT_Init(BT_InitTypedef *BT_Config)
   // master or slave
   if(BT_Config->Server&MASTER_S)
   {
-	 BT_MasterInit();
+	 BT_MasterInit(BT_Config->BT_Master);
   }
   else
   {
-	 BT_SlaveInit();
+	 BT_SlaveInit(BT_Config->BT_Slave);
   }
+  
+  for(Count=0;Count>10000;Count++);
+ 
+  return 1;
+}
+
+
+u8   BT_MasterInit(BT_MasterTypedef *BT_MasterConfig)
+{
+
+
+}
+
+
+u8   BT_SlaveInit(BT_SlaveTypedef *BT_SlaveConfig)
+{
+
 }
 
   u8   BT_Set();
   u8   BT_RState();
-  u8   BT_MasterInit();
-  u8   BT_SlaveInit();
   u8   BT_CMD();
