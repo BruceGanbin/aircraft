@@ -78,18 +78,17 @@ void Usart_Configuration(void)
   USART_InitStructure.USART_Parity = USART_Parity_No ;
   USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-  USART_Init(USART1,&USART_InitStructure);
-  //USART2
-  USART_InitStructure.USART_BaudRate=9600;
+
   USART_Init(USART2,&USART_InitStructure);
+  USART_Init(USART1,&USART_InitStructure);
 
   USART_Cmd(USART1,ENABLE);
   USART_Cmd(USART2,ENABLE);
 
-//  USART_DMACmd(USART1,USART_DMAReq_Tx,ENABLE);
-//  USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);
-//  USART_ITConfig(USART1,USART_IT_TXE,ENABLE);
-  USART_ITConfig(USART1,USART_IT_RXNE,ENABLE);
+  USART_DMACmd(USART1,USART_DMAReq_Tx,ENABLE);
+  USART_DMACmd(USART2,USART_DMAReq_Tx,ENABLE);
+  //  USART_ITConfig(USART1,USART_IT_TXE,ENABLE);
+  USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);
   USART_ITConfig(USART2,USART_IT_RXNE,ENABLE);
 
 }
@@ -201,21 +200,27 @@ void NVIC_Configuration(void)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-
-  NVIC_InitStructure.NVIC_IRQChannel=TIM3_IRQn;
+*/
+  NVIC_InitStructure.NVIC_IRQChannel=TIM4_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=2;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
 	
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4); 
-  NVIC_InitStructure.NVIC_IRQChannel=DMA1_Channel1_IRQn;
+//  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4); 
+  NVIC_InitStructure.NVIC_IRQChannel=DMA1_Channel7_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=3;
   NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-*/
+
+  NVIC_InitStructure.NVIC_IRQChannel=DMA1_Channel4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority=3;
+  NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
 }
 
 
@@ -225,15 +230,17 @@ void NVIC_Configuration(void)
  @Return_Value :Null
  @Peremater    :Null
  @Brief        :
-*************************************************
+*************************************************/
 void DMA_Configuration(void)
 {
   DMA_InitTypeDef DMA_InitStructure;
+	u8 tempBuffer=0;
 //  DMA_DeInit(DMA1_Channel4);  
-  DMA_InitStructure.DMA_PeripheralBaseAddr=0x40013804;//USART1_TX 
-  DMA_InitStructure.DMA_MemoryBaseAddr=(u32)USART_Rbuffer;
+//  DMA form USART2_TX
+  DMA_InitStructure.DMA_PeripheralBaseAddr=0x40004404;//USART2_TX 
+  DMA_InitStructure.DMA_MemoryBaseAddr=(u32)tempBuffer;
   DMA_InitStructure.DMA_DIR=DMA_DIR_PeripheralDST;
-  DMA_InitStructure.DMA_BufferSize=100;
+  DMA_InitStructure.DMA_BufferSize=1;
   DMA_InitStructure.DMA_PeripheralInc=DMA_PeripheralInc_Disable;
   DMA_InitStructure.DMA_MemoryInc=DMA_MemoryInc_Enable;
   DMA_InitStructure.DMA_PeripheralDataSize=DMA_PeripheralDataSize_Byte;
@@ -241,11 +248,15 @@ void DMA_Configuration(void)
   DMA_InitStructure.DMA_Mode=DMA_Mode_Normal;
   DMA_InitStructure.DMA_Priority=DMA_Priority_High;
   DMA_InitStructure.DMA_M2M=DMA_M2M_Disable;
+  DMA_Init(DMA1_Channel7,&DMA_InitStructure);
+//  DMA form USART2_TX  
+  DMA_InitStructure.DMA_PeripheralBaseAddr=0x40013804;//USART1_TX 
   DMA_Init(DMA1_Channel4,&DMA_InitStructure);
-  
-  
+
+  //   DMA_ITConfig(DMA1_Channel4,DMA_IT_TC,ENABLE);
+  //   DMA_ITConfig(DMA1_Channel7,DMA_IT_TC,ENABLE);
 }
-**/
+
 
 
 
@@ -283,25 +294,20 @@ void IIC_Configuration(void)
 void TIME_Configuration(void)
 {
   TIM_TimeBaseInitTypeDef TimeBaseStructure;
-  TimeBaseStructure.TIM_Prescaler=8-1;// 9  
-  TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;
-  TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
-  TimeBaseStructure.TIM_Period=100-1;
-  TimeBaseStructure.TIM_RepetitionCounter=0;
-                    
-  TIM_TimeBaseInit(TIM1,&TimeBaseStructure);
+
 //  TIM_TimeBaseInit(TIM2,&TimeBaseStructure);
 //  TIM_TimeBaseInit(TIM3,&TimeBaseStructure);
   //  TIM_ITConfig(TIM2,TIM_IT_Update,ENABLE);
 
-  TimeBaseStructure.TIM_Prescaler=7;
+  TimeBaseStructure.TIM_Prescaler=7199;
   TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;
   TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
-  TimeBaseStructure.TIM_Period=299;
-  TIM_TimeBaseInit(TIM5,&TimeBaseStructure);
-  TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
-  TIM_ITConfig(TIM5,TIM_IT_Update,ENABLE);
+  TimeBaseStructure.TIM_Period=99;
+  TIM_TimeBaseInit(TIM4,&TimeBaseStructure);
 
+  TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+  TIM_ITConfig(TIM4,TIM_IT_Update,ENABLE);
+  TIM_Cmd(TIM4,DISABLE);
 
 }                                                     
 
@@ -433,7 +439,7 @@ u16  ADC_StartCmd(FunctionalState NewState)
  *@ Return Value :Null
  *@ Peremater    :uint32
  *@ Brief        :
- ***********************************************
+ ***********************************************/
 void delayus(u32 nCount)
 {
  if (SysTick_Config (SystemCoreClock / 1000000)) 
@@ -453,7 +459,7 @@ void delayms(u32 nCount)
 	{};
   SysTick->CTRL=0x00;
   SysTick->VAL =0X00; 
-}*/
+}
 
 
 /*

@@ -53,10 +53,10 @@ void ADC_Confituration(void);
 void State_init(void);
 
 void TimeCount_Init(void);
-u8 delayS(u16 nCount);
+u8 delayS(u16 nCount);*/
 void delayms(u32 nCount);
 void delayus(u32 nCount);
-	*/
+	
 
 #ifdef __cplusplus
 }
