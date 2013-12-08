@@ -22,6 +22,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "usart.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
@@ -38,9 +39,8 @@
 /*            Cortex-M3 Processor Exceptions Handlers                         */
 /******************************************************************************/
 
-//u32 TimeCount;
-u8  Receive_buffer;
-u32 Receive_Count;
+
+
 /**
   * @brief   This function handles NMI exception.
   * @param  None
@@ -133,11 +133,11 @@ void PendSV_Handler(void)
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
-
+*/
 void SysTick_Handler(void)
 {															 
-
-}  */
+TimeCount--;
+}  
 
 /**
    * @brief  This function handles TIM2 global interrupt request.
@@ -164,31 +164,101 @@ void TIM5_IRQHandler(void)
    * @brief  This function handles TIM7 global interrupt request.
    * @param  None
    * @retval None
-   
+	***/   
+static u8 Usart1_TimeOut=0;
+static u8 Usart2_TimeOut=0;
+static u8 Uart_TimeEN=0;
 void TIM4_IRQHandler(void)
 {
 //  TIM_ITConfig(TIM4,TIM_IT_Update,DISABLE);
-    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
-    {
-     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-     LoopStepMotor();  
-    }
+  if(TIM_GetITStatus(TIM4, TIM_IT_Update))
+  {
+	 if(Usart_Sta & USART1R_OPEN)
+	 {
+		if( Usart1_TimeOut>=50)
+		{
+		//		TIM_Cmd(TIM4,DISABLE);
+		USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);  
+		Usart_Sta|=USART1R_OVER;
+		}
+		else
+			Usart1_TimeOut++;
+	 }
+	 
+	 if(Usart_Sta & USART2R_OPEN)
+	 {
+		 if(Usart2_TimeOut>=50 )
+		 {
+		//		TIM_Cmd(TIM4,DISABLE);
+		USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);  
+		Usart_Sta|=USART2R_OVER;
+		 }
+		 else
+			 Usart2_TimeOut++;
+	 }
+		
+	 if((Usart_Sta & (USART1R_OVER|USART2R_OVER)) == (USART1R_OVER|USART2R_OVER))
+	 {
+		 TIM_Cmd(TIM4,DISABLE);	Uart_TimeEN=0;
+		 Usart_Sta &= (~(USART1R_OPEN|USART2R_OPEN));
+	 }
 
+
+  }
+  TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+  //if(  )TIM_Cmd(TIM4,DISABLE);
 //  TIM_ITConfig(TIM4,TIM_IT_Update,ENABLE);
-}    */
+
+}    
 
 /**
   * @brief  This function handles USART1_IRQHandler.
   * @param  None
   * @retval None
   */
+
 void USART1_IRQHandler(void)
 {
-	 
- 	      
+  if(USART_GetITStatus(USART1,USART_IT_RXNE)!=RESET)
+  {
+	 USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);			   
+	 if(Uart_TimeEN==0)
+		{
+		  TIM_Cmd(TIM4,ENABLE);
+			Uart_TimeEN=1;
+      Usart1_RxCount=0;			
+		  Usart_Sta &= USART1R_CLOVER;
+		}
+
+	 Usart1_RxBuffer[Usart1_RxCount]=USART_ReceiveData(USART1);
+	 Usart1_RxCount++;
+	 Usart1_TimeOut=0;
+	 USART_ClearITPendingBit(USART1,USART_IT_RXNE); 
+  
+	 USART_ITConfig(USART1,USART_IT_RXNE,ENABLE);  
+  }    
 }
 
-
+void USART2_IRQHandler(void)
+{
+  if(USART_GetITStatus(USART2,USART_IT_RXNE)!=RESET)
+  {
+	 USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);			   
+	 if(Uart_TimeEN==0)
+		{
+		  TIM_Cmd(TIM4,ENABLE);
+			Uart_TimeEN=1;
+      Usart2_RxCount=0;			
+		  Usart_Sta &= USART2R_CLOVER;
+		}
+	 Usart2_RxBuffer[Usart2_RxCount]=USART_ReceiveData(USART2);
+	 Usart2_RxCount++;
+	 Usart2_TimeOut=0;
+	 USART_ClearITPendingBit(USART2,USART_IT_RXNE); 
+  
+	 USART_ITConfig(USART2,USART_IT_RXNE,ENABLE);  	 
+  }    
+}
 
 /******************************************************************************/
 /*                 STM32F10x Peripherals Interrupt Handlers                   */

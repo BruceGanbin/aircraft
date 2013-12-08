@@ -28,7 +28,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-
+#include "includes.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -58,6 +58,7 @@
    void TIM4_IRQHandler(void);
    void TIM5_IRQHandler(void);
    void USART1_IRQHandler(void);
+   void USART2_IRQHandler(void);
 
 #ifdef __cplusplus
 }
