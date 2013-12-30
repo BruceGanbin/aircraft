@@ -119,13 +119,13 @@ void GPIO_Configuration(void)
   GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOA,&GPIO_InitStructure);
 
-  /***Configure the GPIOB_8 for I2C1 SCL mode***************/
-  GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8;
+  /***Configure the GPIOB_6 for I2C1 SCL mode***************/
+  GPIO_InitStructure.GPIO_Pin=GPIO_Pin_6;
   GPIO_InitStructure.GPIO_Speed=GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_OD;
   GPIO_Init(GPIOB,&GPIO_InitStructure);					     
-  /***Configure the GPIOB_9 for I2C1 SDA mode*************/  
-  GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9;
+  /***Configure the GPIOB_7 for I2C1 SDA mode*************/  
+  GPIO_InitStructure.GPIO_Pin=GPIO_Pin_7;
   GPIO_InitStructure.GPIO_Speed=GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_OD;  
   GPIO_Init(GPIOB,&GPIO_InitStructure);		 	
@@ -276,7 +276,7 @@ void IIC_Configuration(void)
   I2C_InitStructure.I2C_OwnAddress1 = 0x00; 
   I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;//使能I2C的应答
   I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;  
-  I2C_InitStructure.I2C_ClockSpeed=100000;
+  I2C_InitStructure.I2C_ClockSpeed=200000;
   I2C_Init(I2C1,&I2C_InitStructure);
   I2C_Cmd(I2C1,ENABLE);
 }

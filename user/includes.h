@@ -35,9 +35,11 @@
 #include  <stm32f10x_conf.h>
 
 #include  <configinit.h>
-#include "string.h"
+#include  <string.h>
 #include  <AT_bluetooth.h>
 #include  <usart.h>
+#include  <IIC.h>
+#include  <MPU6050.h>
 
 
 

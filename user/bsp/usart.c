@@ -57,9 +57,13 @@ if(USART_GetFlagStatus(USART2,USART_FLAG_TC) == SET)
 char *Usart1_Read(u16 *Num)
 {
 //  u16 TimeOver=0;
+//  u16 i=0;
+//  for(i=0;i<Usart1_RxCount;i++)
+//	 Usart1_RxBuffer[i]=0;
+
   USART_ITConfig(USART1,USART_IT_RXNE,ENABLE);
-	Usart_Sta |= USART1R_OPEN;	
-	Usart_Sta &= USART1R_CLOVER;
+  Usart_Sta |= USART1R_OPEN;	
+  Usart_Sta &= USART1R_CLOVER;
   while(!(Usart_Sta & USART1R_OVER)){};
   *Num=Usart1_RxCount;
   return Usart1_RxBuffer;
@@ -69,9 +73,13 @@ char *Usart1_Read(u16 *Num)
 
 char *Usart2_Read(u16 *Num)
 {
+//  u16 i=0;
+//  for(i=0;i<Usart2_RxCount;i++)
+//	 Usart2_RxBuffer[i]=0;
+
   USART_ITConfig(USART2,USART_IT_RXNE,ENABLE);
-	Usart_Sta |= USART2R_OPEN;
-	Usart_Sta &= USART2R_CLOVER;
+  Usart_Sta |= USART2R_OPEN;
+  Usart_Sta &= USART2R_CLOVER;
   while(!(Usart_Sta & USART2R_OVER)){};
   *Num=Usart2_RxCount;
   return Usart2_RxBuffer;
@@ -94,22 +102,3 @@ void Usart2_Ropen(void)
 //	TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
 //  TIM_Cmd(TIM4,ENABLE);
 }
-/**
-*************************************************
- @Function     :Clear_UsartBuffer()
- @Return_Value :Null
- @Peremater    :Null
- @Brief        :
-**************************************************
-void Clear_UsartBuffer(void)
-{
-  u8 i;
-  i=25;
-  do
-	 {
-    USART_Tbuffer[i]=0x00;
-		USART_Rbuffer[i]=0x00;
-	 }while(i--);
-
-}
-**/

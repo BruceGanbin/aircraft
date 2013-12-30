@@ -34,6 +34,7 @@ extern char *Usart1_Read(u16 *Num);
 extern char *Usart2_Read(u16 *Num);
 
 extern void Usart1_Ropen(void);
+extern void Usart2_Ropen(void);
 
 
 

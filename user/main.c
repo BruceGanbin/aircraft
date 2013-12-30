@@ -2,7 +2,7 @@
 #include "string.h"
 
 
-
+void bsp_init(void);
 
 
 
@@ -15,7 +15,8 @@
 int main(void)
 {
   u16 Init_error=0;
-  BT_InitTypedef BT_configure;
+
+
   // config
   Init_error=RCC_Configuration();
   while(!Init_error){}
@@ -26,23 +27,12 @@ int main(void)
   IIC_Configuration();
   DMA_Configuration();
   //
-//  USART_SendData(USART1,'O');
-//	delayms(500);	
-//  Usart1_Send("1234567",7);
-//	delayms(500);
-  Usart1_Ropen();	
-  BT_configure.BT_ReadData=Usart1_Read;
-  BT_configure.BT_SendData=Usart1_Send;
-  BT_configure.BT_Name="Bruce";
-  BT_configure.BT_Auth=AUTH0;
-  BT_configure.BT_Chk=CHK_ODD;
-  BT_configure.BT_StopBit=STOPBIT1;
-  BT_configure.BT_PIN="88888";
+
+  bsp_init();
 
 
-  BT_Init(&BT_configure);
   delayms(500);	
-  Init_error=1;
+
   while(1)
   {
 	 
@@ -58,4 +48,29 @@ int main(void)
 **************************************************************************************************
 ***************************************************************************************************/
 
+void bsp_init(void){
+   MPU6050Init_Typedef MPU6050_Config;
+	BT_InitTypedef BT_configure;
 
+
+  Usart1_Ropen();	
+  Usart2_Ropen();	
+
+	//Init  MPU6050
+  MPU6050_Config.Read_Data = IIC_ReadPage;
+  MPU6050_Config.Write_Data= IIC_WritePage;
+  Init_MPU6050(&MPU6050_Config);
+
+
+
+  //Init bluetooth
+  BT_configure.BT_ReadData=Usart2_Read;
+  BT_configure.BT_SendData=Usart2_Send;
+  BT_configure.BT_Name="bruce";
+  BT_configure.BT_Auth=AUTH1;
+  BT_configure.BT_PIN="222";
+  BT_configure.BT_Disc=DISC_DIS_LNK;
+  BT_configure.BT_LED=LED_FLASH;
+  BT_Init(&BT_configure);
+
+}
