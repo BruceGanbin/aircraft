@@ -30,8 +30,8 @@ extern u8 Usart1_Send(char *pBuffer,u32 SendNumber);
 extern u8 Usart2_Send(char *pBuffer,u32 SendNumber);
 	//	void Clear_UsartBuffer(void);
    
-extern char *Usart1_Read(u16 *Num);
-extern char *Usart2_Read(u16 *Num);
+extern char *Usart1_Read(u16 *Num,u8 swait);
+extern char *Usart2_Read(u16 *Num,u8 swait);
 
 extern void Usart1_Ropen(void);
 extern void Usart2_Ropen(void);

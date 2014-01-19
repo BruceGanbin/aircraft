@@ -81,6 +81,8 @@ typedef unsigned int u32;
 
 #define TIMEOUT                3000
 
+#define LINKOK                 1
+#define LINKLOST               0
 
 typedef struct BLUETOOTH_INIT_
 {
@@ -94,7 +96,7 @@ typedef struct BLUETOOTH_INIT_
 //  BT_SlaveTypedef  *BT_Slave;
   u8    BT_State;
 
-  char *(*BT_ReadData)(u16 *Num);
+  char *(*BT_ReadData)(u16 *Num,u8 swait);
   u8 (*BT_SendData)(char *pData,u32 Num);
 }BT_InitTypedef;
 
@@ -118,11 +120,12 @@ typedef struct BT_SLAVEINIT_
 extern u8 BT_SendData(char *Data);
 extern char *BT_ReadData(u16 *Num);
 
+extern char *BT_ReadLData(char *Sta_link,u16 *Num);
 extern char BT_Init(BT_InitTypedef *BT_Config);
 //  u8   BT_MasterInit(BT_InitTypedef *BT_Config);
 //  u8   BT_SlaveInit(BT_InitTypedef *BT_Config);
 extern char BT_Set(char *cmd,char *p_value);
-//  u8   BT_CkLink();
+
 //  u8   BT_Set();
 //  u8   BT_RState();
 //  u8   BT_GetStater();

@@ -173,40 +173,41 @@ void TIM4_IRQHandler(void)
 //  TIM_ITConfig(TIM4,TIM_IT_Update,DISABLE);
   if(TIM_GetITStatus(TIM4, TIM_IT_Update))
   {
+	 //  uart1 check timout 
 	 if(Usart_Sta & USART1R_OPEN)
 	 {
 		if( Usart1_TimeOut>=50)
 		{
-		//		TIM_Cmd(TIM4,DISABLE);
-		USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);  
-		Usart_Sta|=USART1R_OVER;
+		  USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);  
+		  Usart_Sta |= USART1R_OVER;
+		  Usart_Sta &= ~USART1R_OPEN;
 		}
 		else
-			Usart1_TimeOut++;
+		  Usart1_TimeOut++;
 	 }
-	 
+	 // uart2 check timeout
 	 if(Usart_Sta & USART2R_OPEN)
 	 {
-		 if(Usart2_TimeOut>=50 )
-		 {
-		//		TIM_Cmd(TIM4,DISABLE);
-		USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);  
-		Usart_Sta|=USART2R_OVER;
-		 }
-		 else
-			 Usart2_TimeOut++;
+		if(Usart2_TimeOut>=50 )
+		{
+		  USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);  
+		  Usart_Sta |= USART2R_OVER;
+		  Usart_Sta &= ~USART2R_OPEN;
+		}
+		else
+		  Usart2_TimeOut++;
 	 }
-		
+	 //if  no uart working  will  disable timer 
 	 if((Usart_Sta & (USART1R_OVER|USART2R_OVER)) == (USART1R_OVER|USART2R_OVER))
 	 {
-		 TIM_Cmd(TIM4,DISABLE);	Uart_TimeEN=0;
-		 Usart_Sta &= (~(USART1R_OPEN|USART2R_OPEN));
+		TIM_Cmd(TIM4,DISABLE);	Uart_TimeEN=0;
+		Usart_Sta &= (~(USART1R_OPEN|USART2R_OPEN));
 	 }
 
 
   }
   TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-  //if(  )TIM_Cmd(TIM4,DISABLE);
+
 //  TIM_ITConfig(TIM4,TIM_IT_Update,ENABLE);
 
 }    
@@ -219,15 +220,13 @@ void TIM4_IRQHandler(void)
 
 void USART1_IRQHandler(void)
 {
-  if(USART_GetITStatus(USART1,USART_IT_RXNE)!=RESET)
-  {
+  if(USART_GetITStatus(USART1,USART_IT_RXNE)!=RESET){
 	 USART_ITConfig(USART1,USART_IT_RXNE,DISABLE);			   
-	 if(Uart_TimeEN==0)
-		{
-		  TIM_Cmd(TIM4,ENABLE);
-			Uart_TimeEN=1;
+	 if(Uart_TimeEN==0){
+		TIM_Cmd(TIM4,ENABLE);
+		Uart_TimeEN=1;
       Usart1_RxCount=0;			
-		  Usart_Sta &= USART1R_CLOVER;
+		Usart_Sta &= USART1R_CLOVER;
 		}
 
 	 Usart1_RxBuffer[Usart1_RxCount]=USART_ReceiveData(USART1);
@@ -239,18 +238,17 @@ void USART1_IRQHandler(void)
   }    
 }
 
-void USART2_IRQHandler(void)
-{
-  if(USART_GetITStatus(USART2,USART_IT_RXNE)!=RESET)
-  {
-	 USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);			   
-	 if(Uart_TimeEN==0)
-		{
-		  TIM_Cmd(TIM4,ENABLE);
-			Uart_TimeEN=1;
+void USART2_IRQHandler(void){
+  if(USART_GetITStatus(USART2,USART_IT_RXNE)!=RESET){
+	 USART_ITConfig(USART2,USART_IT_RXNE,DISABLE);
+	 // have not uart work ,open timer to working 
+	 if(Uart_TimeEN==0){
+		TIM_Cmd(TIM4,ENABLE);
+		Uart_TimeEN=1;
       Usart2_RxCount=0;			
-		  Usart_Sta &= USART2R_CLOVER;
-		}
+		Usart_Sta &= USART2R_CLOVER;
+	 }
+
 	 Usart2_RxBuffer[Usart2_RxCount]=USART_ReceiveData(USART2);
 	 Usart2_RxCount++;
 	 Usart2_TimeOut=0;

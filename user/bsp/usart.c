@@ -71,17 +71,32 @@ char *Usart1_Read(u16 *Num)
 
 
 
-char *Usart2_Read(u16 *Num)
+char *Usart2_Read(u16 *Num,u8 swait)
 {
-//  u16 i=0;
-//  for(i=0;i<Usart2_RxCount;i++)
-//	 Usart2_RxBuffer[i]=0;
+  u16 i=0;
+  u16 zero=0;
 
-  USART_ITConfig(USART2,USART_IT_RXNE,ENABLE);
-  Usart_Sta |= USART2R_OPEN;
-  Usart_Sta &= USART2R_CLOVER;
-  while(!(Usart_Sta & USART2R_OVER)){};
-  *Num=Usart2_RxCount;
+  if(!Usart_Sta&USART2R_OPEN){
+	 //clean receive buffer 
+	 for(i=0;i<Usart2_RxCount;i++)
+		Usart2_RxBuffer[i]=0;
+	 //clean flay
+	 Usart2_RxCount = 0;
+	 Usart_Sta |= USART2R_OPEN;
+	 Usart_Sta &= USART2R_CLOVER;
+
+	 Usart2_Ropen();
+  }
+
+  if(swait){
+	 while(!(Usart_Sta & USART2R_OVER)){};
+	 *Num=Usart2_RxCount;
+  }
+  else{
+	 *Num=&zero;
+  }
+
+
   return Usart2_RxBuffer;
 }
 

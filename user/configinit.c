@@ -61,11 +61,12 @@ u16 RCC_Configuration(void)
 }
 
 
-/***************************************************
- *@ Function     :Usart_Configuration()
- *@ Return Value :Null
- *@ Peremater    :Null
- *@ Brief        :Configure the usart and enable the interrupt
+/**
+*************************************************
+ @Function     :Usart_Configuration()
+ @Return Value :Null
+ @Peremater    :Null
+ @Brief        :Configure the usart and enable the interrupt
                  配置串口并且打开串口中断
 ***************************************************/
 void Usart_Configuration(void)
