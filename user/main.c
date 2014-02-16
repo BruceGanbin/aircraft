@@ -14,9 +14,12 @@ void bsp_init(void);
 
 int main(void)
 {
+  regMachTypedef Reg_fly;
+
   u16 Init_error=0;
 
-
+  
+  u8 ret;
 
   // config
   Init_error=RCC_Configuration();
@@ -28,18 +31,17 @@ int main(void)
   IIC_Configuration();
   DMA_Configuration();
   //
-	
-
-	
+	reg_init(&Reg_fly);
   bsp_init();
-
-
-  delayms(500);	
+  
 
   while(1)
   {
-	 cmd_proc();
-	 
+	ret = cmd_proc(&Reg_fly);
+//	if(ret) {  ret=0;}
+
+
+
   }
 	
 //  return 0;
@@ -52,11 +54,9 @@ int main(void)
 ***************************************************************************************************/
 
 void bsp_init(void){
-   MPU6050Init_Typedef MPU6050_Config;
+  MPU6050Init_Typedef MPU6050_Config;
 	BT_InitTypedef BT_configure;
-	char *pdata;
-	char state;
-  u16 num=0;
+
 
   Usart1_Ropen();	
   Usart2_Ropen();	
@@ -64,7 +64,7 @@ void bsp_init(void){
 	//Init  MPU6050
   MPU6050_Config.Read_Data = IIC_ReadPage;
   MPU6050_Config.Write_Data= IIC_WritePage;
-//  Init_MPU6050(&MPU6050_Config);
+ // Init_MPU6050(&MPU6050_Config);
 
   //Init bluetooth
   BT_configure.BT_ReadData=Usart2_Read;
@@ -76,10 +76,5 @@ void bsp_init(void){
   BT_configure.BT_LED=LED_FLASH;
   BT_Init(&BT_configure);
 
-	while(num!=1){	
-	  pdata = BT_ReadLData(&state,&num);
-	  delayms(50);
-		if(state!=0 && num>0)
-			num=0;
-	}
+
 }
