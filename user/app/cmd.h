@@ -51,7 +51,7 @@ extern "C" {
 
 
 	void reg_init(regMachTypedef *reg_mach);
-                
+
 	char cmd_proc(regMachTypedef *reg_mach);
 
 	char cmd_setsta(u16 reg,regstaTypedef *regsta,u8 sData,regperTypedef permission);    // set one switch reg

@@ -31,7 +31,7 @@ int main(void)
   IIC_Configuration();
   DMA_Configuration();
   //
-	reg_init(&Reg_fly);
+  reg_init(&Reg_fly);
   bsp_init();
   
 
@@ -39,7 +39,7 @@ int main(void)
   {
 	ret = cmd_proc(&Reg_fly);
 //	if(ret) {  ret=0;}
-
+	read_sensor()
 
 
   }

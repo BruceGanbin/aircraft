@@ -10,14 +10,11 @@ char cmd_proc(regMachTypedef *reg_mach)
 	u16  Cmd_Num=0;
 	char *Cmd_pData;
 	char Cmd_ret;
-//	u8 Cmd_rdata[20];
 
-	//	char transmit[5];
 	u8   tra_Num=0;
 	char  *pTransmit;
 	cmdTypedef *Cmd_Frame;
 	traTypedef Cmd_Transmit;
-//	eventTypedef  cmd_event;
 
 
 	// change the cmd data come from
