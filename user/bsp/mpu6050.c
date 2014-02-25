@@ -63,8 +63,9 @@ void setExternalFrameSync(unsigned char sync)
 {
 	unsigned char ret=0,temp=0;
 	temp = MPU6050_sread(CONFIG);
-	temp&= ~(MPU6050_CFG_EXT_SYNC_SET<<MPU6050_CFG_EXT_SYNC_OFFSETBIT);
-	MPU6050_swrite(CONFIG,sync&temp);
+	temp&= ~MPU6050_CFG_EXT_SYNC_SET;
+	sync<<=MPU6050_CFG_EXT_SYNC_OFFSETBIT;
+	MPU6050_swrite(CONFIG,sync|temp);
 }
 
 unsigned char getDLPFMode(void)
@@ -78,29 +79,187 @@ void setDLPFMode(unsigned char bandwidth)
 {
 	unsigned char ret=0,temp=0;
 	temp = MPU6050_sread(CONFIG);
-	temp&= ~(MPU6050_CFG_DLPF_CFG_SET<<MPU6050_CFG_DLPF_CFG_OFFSETBIT);
-	MPU6050_swrite(CONFIG,sync&temp);
+	temp&= ~MPU6050_CFG_DLPF_CFG_SET;
+	
+	MPU6050_swrite(CONFIG,bandwidth|temp);
 }
 
 //GYRO_CONFIG register
-unsigned char getFullScaleGyroRange(void);
-void setFullScaleGyroRange(unsigned char range);
+unsigned char getFullScaleGyroRange(void)
+{
+	unsigned char ret=0;
+	ret = MPU6050_sread(GYRO_CONFIG);
+	return ret>>MPU6050_GCONFIG_FS_SEL_SET;
+}
+void setFullScaleGyroRange(unsigned char range)
+{
+	MPU6050_swrite(GYRO_CONFIG,range<<MPU6050_GCONFIG_FS_SEL_SET);
+}
 
 //ACCEL_CONFIG register
-unsigned char getFullScaleAccelRange(void);
-void setFullScaleAccelRange(unsigned char range);
+unsigned char getFullScaleAccelRange(void)
+{
+	unsigned char ret=0;
+	ret = MPU6050_sread(ACCEL_CONFIG);
+	return ret>>MPU6050_ACONFIG_AFS_SEL_BIT;
+}
+void setFullScaleAccelRange(unsigned char range)
+{
+	unsigned char temp=0;
+	temp = MPU6050_sread(ACCEL_CONFIG);
+	temp&= ~MPU6050_ACONFIG_AFS_SEL_SET;
+	range <<= MPU6050_ACONFIG_AFS_SEL_OFFSETBIT;
+	MPU6050_swrite(CONFIG,range|temp);
+}
 
 
 // PWR_MGMT_1 register
-void reset(void);
-unsigned char getSleepEnabled(void);
-void setSleepEnabled(unsigned char enabled);
-unsigned char getWakeCycleEnabled(void);
-void setWakeCycleEnabled(unsigned char enabled);
-unsigned char getTempSensorEnabled(void);
-void setTempSensorEnabled(unsigned char enabled);
-unsigned char getClockSource(void);
-void setClockSource(unsigned char source);
+void reset(void)
+{
+	MPU6050_swrite(PWR_MGMT_1,1<<MPU6050_PWR1_DEVICE_RESET_BIT);
+}
+unsigned char getSleepEnabled(void)
+{
+	unsigned char ret=0,temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	ret = temp&~(1<<MPU6050_PWR1_SLEEP_BIT);
+	return ret;
+}
+void setSleepEnabled(unsigned char enabled)
+{
+	unsigned char temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	temp|= 1<<MPU6050_PWR1_SLEEP_BIT;
+	MPU6050_swrite(PWR_MGMT_1,temp);
+}
+unsigned char getWakeCycleEnabled(void)
+{
+	unsigned char ret=0,temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	ret = temp&~(1<<MPU6050_PWR1_CYCLE_BIT);
+	return ret;
+}
+void setWakeCycleEnabled(unsigned char enabled)
+{
+	unsigned char temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	temp|= 1<<MPU6050_PWR1_CYCLE_BIT;
+	MPU6050_swrite(PWR_MGMT_1,temp);
+}
+unsigned char getTempSensorEnabled(void)
+{
+	unsigned char ret=0,temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	ret = temp&~(1<<MPU6050_PWR1_TEMP_DIS_BIT);
+	return ret;
+}
+void setTempSensorEnabled(unsigned char enabled)
+{
+	unsigned char temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	temp|= 1<<MPU6050_PWR1_TEMP_DIS_BIT;
+	MPU6050_swrite(PWR_MGMT_1,temp);
+}
+unsigned char getClockSource(void)
+{
+	unsigned char ret=0,temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	ret  = temp &~MPU6050_PWR1_CLKSEL_SET;
+	return ret;
+}
+void setClockSource(unsigned char source)
+{
+	unsigned char ret=0,temp=0;
+	temp = MPU6050_sread(PWR_MGMT_1);
+	temp&= ~MPU6050_PWR1_CLKSEL_SET;
+	MPU6050_swrite(PWR_MGMT_1,temp|source);
+}
+
+
+
+// MOT_THR register
+unsigned char getMotionDetectionThreshold(void);
+void setMotionDetectionThreshold(unsigned char threshold);
+
+// INT_PIN_CFG register
+unsigned char getInterruptMode(void);
+void setInterruptMode(unsigned char mode);
+unsigned char  getInterruptDrive(void);
+void setInterruptDrive(unsigned char drive);
+unsigned char getInterruptLatch(void);
+void setInterruptLatch(unsigned char latch);
+unsigned char getInterruptLatchClear(void);
+void setInterruptLatchClear(unsigned char clear);
+unsigned char getFSyncInterruptLevel(void);
+void setFSyncInterruptLevel(unsigned char level);
+unsigned char getFSyncInterruptEnabled(void);
+void setFSyncInterruptEnabled(unsigned char enabled);
+unsigned char getI2CBypassEnabled(void);
+void setI2CBypassEnabled(unsigned char enabled);
+
+// INT_ENABLE register
+unsigned char getIntMotionEnabled(void);
+void setIntMotionEnabled(unsigned char enabled);
+unsigned char getIntFIFOBufferOverflowEnabled(void);
+void setIntFIFOBufferOverflowEnabled(unsigned char enabled);
+unsigned char getIntI2CMasterEnabled(void);
+void setIntI2CMasterEnabled(unsigned char enabled);
+unsigned char getIntDataReadyEnabled(void);
+void setIntDataReadyEnabled(bool enabled);
+
+// INT_STATUS register
+unsigned char getIntMotionStatus();
+unsigned char getIntFIFOBufferOverflowStatus();
+unsigned char getIntI2CMasterStatus();
+unsigned char getIntDataReadyStatus();
+
+// ACCEL_*OUT_* registers
+void getAcceleration(short int* x,short int* y,short int* z);
+short int getAccelerationX(void);
+short int getAccelerationY(void);
+short int getAccelerationZ(void);
+
+// TEMP_OUT_* registers
+short int getTemperature(void);
+
+// GYRO_*OUT_* registers
+void getgyroscope(short int* x,short int* y,short int* z);
+short int getgyroscopeX(void);
+short int getgyroscopeY(void);
+short int tgetgyroscopeZ(void);
+
+void getMotion6(short int* ax,short int* ay,short int* az,short int* gx,short int* gy,short int* gz);
+
+//void Read_MPU6050AG(MPU6050AGVALUE_Typedef *pAg_value);
+
+
+// SIGNAL_PATH_RESET register
+void resetGyroscopePath(void);
+void resetAccelerometerPath(void);
+void resetTemperaturePath(void);
+
+// MOT_DETECT_CTRL register
+unsigned char getAccelerometerPowerOnDelay(void);
+void setAccelerometerPowerOnDelay(unsigned char delay);
+
+// MOT_DETECT_CTRL register
+unsigned char getAccelerometerPowerOnDelay(void);
+void setAccelerometerPowerOnDelay(unsigned char delay);
+unsigned char getFreefallDetectionCounterDecrement(void);
+void setFreefallDetectionCounterDecrement(unsigned char decrement);
+unsigned char getMotionDetectionCounterDecrement(void);
+void setMotionDetectionCounterDecrement(unsigned decrement);
+
+// USER_CTRL register
+unsigned char getFIFOEnabled(void);
+void setFIFOEnabled(unsigned char enabled);
+unsigned char getI2CMasterModeEnabled(void);
+void setI2CMasterModeEnabled(unsigned char enabled);
+void switchSPIEnabled(unsigned char enabled);
+void resetFIFO(void);
+void resetI2CMaster(void);
+void resetSensors(void);
+
 /**
 
 ****/
