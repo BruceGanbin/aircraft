@@ -289,8 +289,8 @@
 #define MPU6050_PATHRESET_ACCEL_RESET_BIT   1
 #define MPU6050_PATHRESET_TEMP_RESET_BIT    0
 
-#define MPU6050_DETECT_ACCEL_ON_DELAY_BIT       5
-#define MPU6050_DETECT_ACCEL_ON_DELAY_LENGTH    2
+#define MPU6050_DETECT_ACCEL_ON_DELAY_SET       3<<4
+#define MPU6050_DETECT_ACCEL_ON_DELAY_OFFSET    4
 #define MPU6050_DETECT_FF_COUNT_BIT             3
 #define MPU6050_DETECT_FF_COUNT_LENGTH          2
 #define MPU6050_DETECT_MOT_COUNT_BIT            1
@@ -344,8 +344,8 @@
 #define MPU6050_BANKSEL_MEM_SEL_BIT         4
 #define MPU6050_BANKSEL_MEM_SEL_LENGTH      5
 
-#define MPU6050_WHO_AM_I_BIT        6
-#define MPU6050_WHO_AM_I_LENGTH     6
+#define MPU6050_WHO_AM_I_SET        0x7E
+#define MPU6050_WHO_AM_I_LENGTH     1
 
 #define MPU6050_DMP_MEMORY_BANKS        8
 #define MPU6050_DMP_MEMORY_BANK_SIZE    256
@@ -366,7 +366,7 @@ typedef struct _MPU6050{
 
 }MPU6050Init_Typedef;
 
-
+/*
 
 typedef struct _MPU6050_AG_VALUE{
 
@@ -377,7 +377,7 @@ typedef struct _MPU6050_AG_VALUE{
 	unsigned int GYROY;
 	unsigned int GYROZ;
 }MPU6050AGVALUE_Typedef;
-
+*/
 
 
 void Init_MPU6050(MPU6050Init_Typedef *MPU6050_Config);
@@ -428,13 +428,13 @@ void setIntFIFOBufferOverflowEnabled(unsigned char enabled);
 unsigned char getIntI2CMasterEnabled(void);
 void setIntI2CMasterEnabled(unsigned char enabled);
 unsigned char getIntDataReadyEnabled(void);
-void setIntDataReadyEnabled(bool enabled);
+void setIntDataReadyEnabled(unsigned char enabled);
 
 // INT_STATUS register
-unsigned char getIntMotionStatus();
-unsigned char getIntFIFOBufferOverflowStatus();
-unsigned char getIntI2CMasterStatus();
-unsigned char getIntDataReadyStatus();
+unsigned char getIntMotionStatus(void);
+unsigned char getIntFIFOBufferOverflowStatus(void);
+unsigned char getIntI2CMasterStatus(void);
+unsigned char getIntDataReadyStatus(void);
 
 // ACCEL_*OUT_* registers
 void getAcceleration(short int* x,short int* y,short int* z);
@@ -451,7 +451,7 @@ short int getgyroscopeX(void);
 short int getgyroscopeY(void);
 short int tgetgyroscopeZ(void);
 
-void getMotion6(short int* ax,short int* ay,short int* az,short int* gx,short int* gy,short int* gz);
+void getMotion6(short int* ax,short int* ay,short int* az,short int* gx,short int* gy,short int* gz,short int* temp);
 
 //void Read_MPU6050AG(MPU6050AGVALUE_Typedef *pAg_value);
 
@@ -461,24 +461,22 @@ void resetGyroscopePath(void);
 void resetAccelerometerPath(void);
 void resetTemperaturePath(void);
 
-// MOT_DETECT_CTRL register
-unsigned char getAccelerometerPowerOnDelay(void);
-void setAccelerometerPowerOnDelay(unsigned char delay);
 
 // MOT_DETECT_CTRL register
 unsigned char getAccelerometerPowerOnDelay(void);
 void setAccelerometerPowerOnDelay(unsigned char delay);
+/*
 unsigned char getFreefallDetectionCounterDecrement(void);
 void setFreefallDetectionCounterDecrement(unsigned char decrement);
 unsigned char getMotionDetectionCounterDecrement(void);
 void setMotionDetectionCounterDecrement(unsigned decrement);
-
+*/
 // USER_CTRL register
 unsigned char getFIFOEnabled(void);
 void setFIFOEnabled(unsigned char enabled);
 unsigned char getI2CMasterModeEnabled(void);
 void setI2CMasterModeEnabled(unsigned char enabled);
-void switchSPIEnabled(unsigned char enabled);
+//void switchSPIEnabled(unsigned char enabled);
 void resetFIFO(void);
 void resetI2CMaster(void);
 void resetSensors(void);
