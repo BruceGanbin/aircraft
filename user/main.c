@@ -19,8 +19,8 @@ int main(void)
   u16 Init_error=0;
 
   
-  u8 ret;
-
+  u8 ret,i,j=0;
+	s16 Data[7]={0},ax=0,ay=0,az=0,gx=0,gy=0,gz=0;
   // config
   Init_error=RCC_Configuration();
   while(!Init_error){}
@@ -37,13 +37,10 @@ int main(void)
 
   while(1)
   {
-	ret = cmd_proc(&Reg_fly);
+//	ret = cmd_proc(&Reg_fly);
 //	if(ret) {  ret=0;}
-	read_sensor()
-
-
-  }
-	
+	getMotion6(&Data[0],&Data[1],&Data[2],&Data[3],&Data[4],&Data[5],&Data[6]);
+	}
 //  return 0;
 } 
 
@@ -64,7 +61,7 @@ void bsp_init(void){
 	//Init  MPU6050
   MPU6050_Config.Read_Data = IIC_ReadPage;
   MPU6050_Config.Write_Data= IIC_WritePage;
- // Init_MPU6050(&MPU6050_Config);
+  Init_MPU6050(&MPU6050_Config);
 
   //Init bluetooth
   BT_configure.BT_ReadData=Usart2_Read;

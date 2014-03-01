@@ -30,25 +30,23 @@ char MPU6050_sread(unsigned char WriteAddr)
 
 void Init_MPU6050(MPU6050Init_Typedef *MPU6050_Config){
   
-  unsigned char Rdata[5]={0};
-  
+ // unsigned char Rdata[5]={0};
+	unsigned char ID = 0;
+
   Single_read = MPU6050_Config->Read_Data;
   Single_write= MPU6050_Config->Write_Data;
 
-
-  //  MPU6050_swrite(PWR_MGMT_1,0x07);
+  ID = getDeviceID();
+	if(ID!=0x68){}
+//  MPU6050_swrite(PWR_MGMT_1,0x07);
   MPU6050_swrite(PWR_MGMT_1,0x00);
   MPU6050_swrite(SMPLRT_DIV,0x07);
   MPU6050_swrite(CONFIG,0x06);
-  MPU6050_swrite(GYRO_CONFIG,0x18);
-  MPU6050_swrite(ACCEL_CONFIG,0x01);
+  MPU6050_swrite(GYRO_CONFIG,0x00);
+  MPU6050_swrite(ACCEL_CONFIG,0x00);
+	
 }
 
-
-unsigned char testConnection(void)   //test read ID 
-{
-	return getDeviceID(); //== 0x
-}
 
 //CONFIG register
 unsigned char getExternalFrameSync(void)
@@ -61,7 +59,7 @@ unsigned char getExternalFrameSync(void)
 
 void setExternalFrameSync(unsigned char sync)
 {
-	unsigned char ret=0,empty=0;
+	unsigned char empty=0;
 	empty = MPU6050_sread(CONFIG);
 	empty&= ~MPU6050_CFG_EXT_SYNC_SET;
 	sync<<=MPU6050_CFG_EXT_SYNC_OFFSETBIT;
@@ -72,12 +70,12 @@ unsigned char getDLPFMode(void)
 {
 	unsigned char ret=0;
 	ret = MPU6050_sread(CONFIG);
-	ret&= MPU6050_CFG_DLPF_CFG_BIT;
+	ret&= MPU6050_CFG_DLPF_CFG_SET;
 	return ret>>MPU6050_CFG_DLPF_CFG_OFFSETBIT;
 }
 void setDLPFMode(unsigned char bandwidth)
 {
-	unsigned char ret=0,empty=0;
+	unsigned char empty=0;
 	empty = MPU6050_sread(CONFIG);
 	empty&= ~MPU6050_CFG_DLPF_CFG_SET;
 	
@@ -101,7 +99,7 @@ unsigned char getFullScaleAccelRange(void)
 {
 	unsigned char ret=0;
 	ret = MPU6050_sread(ACCEL_CONFIG);
-	return ret>>MPU6050_ACONFIG_AFS_SEL_BIT;
+	return ret>>MPU6050_ACONFIG_AFS_SEL_SET;
 }
 void setFullScaleAccelRange(unsigned char range)
 {
@@ -136,7 +134,7 @@ unsigned char getWakeCycleEnabled(void)
 {
 	unsigned char ret=0,empty=0;
 	empty = MPU6050_sread(PWR_MGMT_1);
-	ret = empt&~(1<<MPU6050_PWR1_CYCLE_BIT);
+	ret = empty&~(1<<MPU6050_PWR1_CYCLE_BIT);
 	return ret;
 }
 void setWakeCycleEnabled(unsigned char enabled)
@@ -272,7 +270,7 @@ void setFSyncInterruptEnabled(unsigned char enabled)
 {
 	unsigned char empty=0;
 	empty = MPU6050_sread(INT_PIN_CFG);
-	enabled<<=MPU6050_INTCFG_FSYNC_INT_EN_BIT
+	enabled<<=MPU6050_INTCFG_FSYNC_INT_EN_BIT;
 	MPU6050_swrite(INT_PIN_CFG,empty|enabled);
 }
 unsigned char getI2CBypassEnabled(void)
@@ -293,7 +291,7 @@ void setI2CBypassEnabled(unsigned char enabled)
 // INT_ENABLE register
 unsigned char getIntMotionEnabled(void)
 {
-	unsigned char ret=0,temp=0;
+	unsigned char ret=0,empty=0;
 	empty = MPU6050_sread(INT_ENABLE);
 	ret  = empty&(1<<MPU6050_INTERRUPT_MOT_BIT);
 	return ret>>MPU6050_INTERRUPT_MOT_BIT;
@@ -316,7 +314,7 @@ void setIntFIFOBufferOverflowEnabled(unsigned char enabled)
 {
 	unsigned char empty=0;
 	empty = MPU6050_sread(INT_ENABLE);
-	enabled<<=MPU6050_INTERRUPT_FIFO_OFLOW_BIT
+	enabled<<=MPU6050_INTERRUPT_FIFO_OFLOW_BIT;
 	MPU6050_swrite(INT_ENABLE,empty|enabled);
 }
 unsigned char getIntI2CMasterEnabled(void)
@@ -382,17 +380,17 @@ unsigned char getIntDataReadyStatus(void)
 void getAcceleration(short int* x,short int* y,short int* z)
 {
 
-	unsigned char Data[6]=0;
+	unsigned char Data[6]={0};
 
 	Single_read(Data,MPU6050_Addr,ACCEL_XOUT_H,6);
 
-	x = (Data[0]<<8)|Data[1];
-	y = (Data[2]<<8)|Data[3];
-	z = (Data[4]<<8)|Data[5];
+	*x = (Data[0]<<8)|Data[1];
+	*y = (Data[2]<<8)|Data[3];
+	*z = (Data[4]<<8)|Data[5];
 }
 short int getAccelerationX(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,ACCEL_XOUT_H,2);
@@ -402,7 +400,7 @@ short int getAccelerationX(void)
 }
 short int getAccelerationY(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,ACCEL_YOUT_H,2);
@@ -412,7 +410,7 @@ short int getAccelerationY(void)
 }
 short int getAccelerationZ(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,ACCEL_ZOUT_H,2);
@@ -424,7 +422,7 @@ short int getAccelerationZ(void)
 // TEMP_OUT_* registers
 short int getTemperature(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,TEMP_OUT_H,2);
@@ -436,17 +434,17 @@ short int getTemperature(void)
 // GYRO_*OUT_* registers
 void getgyroscope(short int* x,short int* y,short int* z)
 {
-	unsigned char Data[6]=0;
+	unsigned char Data[6]={0};
 
 	Single_read(Data,MPU6050_Addr,GYRO_XOUT_H,6);
 
-	x = (Data[0]<<8)|Data[1];
-	y = (Data[2]<<8)|Data[3];
-	z = (Data[4]<<8)|Data[5];
+	*x = (Data[0]<<8)|Data[1];
+	*y = (Data[2]<<8)|Data[3];
+	*z = (Data[4]<<8)|Data[5];
 }
 short int getgyroscopeX(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,GYRO_XOUT_H,2);
@@ -456,7 +454,7 @@ short int getgyroscopeX(void)
 }
 short int getgyroscopeY(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,GYRO_YOUT_H,2);
@@ -466,7 +464,7 @@ short int getgyroscopeY(void)
 }
 short int tgetgyroscopeZ(void)
 {
-	unsigned char Data[2]=0;
+	unsigned char Data[2]={0};
 	short int ret;
 
 	Single_read(Data,MPU6050_Addr,GYRO_ZOUT_H,2);
@@ -477,19 +475,19 @@ short int tgetgyroscopeZ(void)
 
 void getMotion6(short int* ax,short int* ay,short int* az,short int* gx,short int* gy,short int* gz,short int* temp)
 {
-	unsigned char Data[14]=0;
+	unsigned char Data[14]={0};
 
-	Single_read(Data,MPU6050_Addr,GYRO_XOUT_H,14);
+	Single_read(Data,MPU6050_Addr,ACCEL_XOUT_H,14);
 
-	ax = (Data[0]<<8)|Data[1];
-	ay = (Data[2]<<8)|Data[3];
-	az = (Data[4]<<8)|Data[5];
+	*ax = (Data[0]<<8)|Data[1];
+	*ay = (Data[2]<<8)|Data[3];
+	*az = (Data[4]<<8)|Data[5];
 
-	temp = (Data[6]<<8)|Data[7];
+	*temp = (Data[6]<<8)|Data[7];
 
-	gx = (Data[8]<<8)|Data[9];
-	gy = (Data[10]<<8)|Data[11];
-	gz = (Data[12]<<8)|Data[13];
+	*gx = (Data[8]<<8)|Data[9];
+	*gy = (Data[10]<<8)|Data[11];
+	*gz = (Data[12]<<8)|Data[13];
 }
 
 
@@ -520,8 +518,8 @@ void resetTemperaturePath(void)
 unsigned char getAccelerometerPowerOnDelay(void)
 {
 	unsigned char empty=0;
-	temp = MPU6050_sread(MOT_DETECT_CTRL);
-	return temp>>MPU6050_DETECT_ACCEL_ON_DELAY_OFFSET;
+	empty = MPU6050_sread(MOT_DETECT_CTRL);
+	return empty>>MPU6050_DETECT_ACCEL_ON_DELAY_OFFSET;
 }
 void setAccelerometerPowerOnDelay(unsigned char delay)
 {
@@ -586,14 +584,14 @@ void resetSensors(void)
 // WHO_AM_I register
 unsigned char getDeviceID(void)
 {
-	unsigned char empty=0,ret=0;
-	ret = MPU6050_sread(WHO_AM_I);
-	return ret>>1;
+	unsigned char ret=0;
+	ret = MPU6050_sread(WHO);
+	return ret;
 }
 void setDeviceID(unsigned char id)
 {
 
-	MPU6050_swrite(WHO_AM_I,id<<1);
+	MPU6050_swrite(WHO,id<<1);
 }
 
 /**

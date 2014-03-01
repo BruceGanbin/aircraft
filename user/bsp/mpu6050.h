@@ -504,7 +504,7 @@ void setStandbyZAccelEnabled(unsigned char enabled);
 unsigned char getStandbyXGyroEnabled(void);
 void setStandbyXGyroEnabled(unsigned char enabled);
 unsigned char getStandbyYGyroEnabled(void);
-void setStandbyYGyroEnabled(unsingned char enabled);
+void setStandbyYGyroEnabled(unsigned char enabled);
 unsigned char getStandbyZGyroEnabled(void);
 void setStandbyZGyroEnabled(unsigned char enabled);
 
