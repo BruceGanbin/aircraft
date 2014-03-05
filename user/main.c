@@ -19,8 +19,8 @@ int main(void)
   u16 Init_error=0;
 
   
-  u8 ret,i,j=0;
-	s16 Data[7]={0},ax=0,ay=0,az=0,gx=0,gy=0,gz=0;
+  u8 ret;
+	s16 Data[7]={0};
   // config
   Init_error=RCC_Configuration();
   while(!Init_error){}

@@ -366,18 +366,7 @@ typedef struct _MPU6050{
 
 }MPU6050Init_Typedef;
 
-/*
 
-typedef struct _MPU6050_AG_VALUE{
-
-	unsigned int AccelX;
-	unsigned int AccelY;
-	unsigned int AccelZ;
-	unsigned int GYROX;
-	unsigned int GYROY;
-	unsigned int GYROZ;
-}MPU6050AGVALUE_Typedef;
-*/
 
 
 void Init_MPU6050(MPU6050Init_Typedef *MPU6050_Config);

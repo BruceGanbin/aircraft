@@ -2,9 +2,9 @@
 #include "includes.h"
 
 
-unsigned char *(*Single_read)(unsigned char *pBuffer,unsigned char PartAddr,      \
+static unsigned char *(*Single_read)(unsigned char *pBuffer,unsigned char PartAddr,      \
 										unsigned char WriteAddr,unsigned char NumByteToWrite);
-unsigned char *(*Single_write)(unsigned char *pBuffer,unsigned char PartAddr,     \
+static unsigned char *(*Single_write)(unsigned char *pBuffer,unsigned char PartAddr,     \
 										 unsigned char WriteAddr,unsigned char NumByteToWrite);
 
 
@@ -37,9 +37,9 @@ void Init_MPU6050(MPU6050Init_Typedef *MPU6050_Config){
   Single_write= MPU6050_Config->Write_Data;
 
   ID = getDeviceID();
-	if(ID!=0x68){}
-//  MPU6050_swrite(PWR_MGMT_1,0x07);
-  MPU6050_swrite(PWR_MGMT_1,0x00);
+  if(ID!=0x68){} // cheack the mpu6050
+
+  MPU6050_swrite(PWR_MGMT_1,MPU6050_CLOCK_INTERNAL);
   MPU6050_swrite(SMPLRT_DIV,0x07);
   MPU6050_swrite(CONFIG,0x06);
   MPU6050_swrite(GYRO_CONFIG,0x00);
