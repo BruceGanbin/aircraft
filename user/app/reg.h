@@ -1,10 +1,6 @@
 #ifndef _REG_H
 #define  _REG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "includes.h"
 
 // CONFIG-------------------------
@@ -48,56 +44,55 @@ extern "C" {
 
 
 #define STA_NUM                4
-	// status reg------------------------------
-	typedef struct _REG_STATUS{
-		u8 led_sta;
-		u8 motor_sta;
-		u8 sensor_sta;
-		u8 orien_sta;
+// status reg------------------------------
+typedef struct _REG_STATUS{
+	u8 led_sta;
+	u8 motor_sta;
+	u8 sensor_sta;
+	u8 orien_sta;
 	   
-	}regstaTypedef;
+}regstaTypedef;
+/******
+         |  bit7  |  bit6  |  bit5  |  bit4  |  bit3  |  bit2  |  bit1  |  bit0  |
+led_sta  |reserive|
 
-	typedef struct _REG_PER{
-		u8 usr;
+
+
+******/
+
+typedef struct _REG_PER{
+	u8 usr;
 		
-	}regperTypedef;
+}regperTypedef;
 
-#define DATA_NUM               6
-	// data reg------------------------------
-	typedef struct _REG_DATA{
+#define DATA_NUM               9
+// data reg------------------------------
+typedef struct _REG_DATA{
 
-		u16 AccelX;
-		u16 AccelY;
-		u16 AccelZ;
-		u16 GYROX;
-		u16 GYROY;
-		u16 GYROZ;
+	SensorData_Typedef sensorData;
 	 
-	}regdatTypedef;
+}regdatTypedef;
 
-	//pidk data reg
-	typedef struct _PIDK_TYPEDEF{
-		u16 kp;
-		u16 ki;
-		u16 kd;
-	}pidk_Typedef;
+//pidk data reg
+typedef struct _PIDK_TYPEDEF{
+	u16 kp;
+	u16 ki;
+	u16 kd;
+}pidk_Typedef;
 
-	// all reg  -----------------------------
-	typedef struct _REG_MACH{
+// all reg  -----------------------------
+typedef struct _REG_MACH{
 
-		u8 machnum;
-		regstaTypedef regsta;
-		regperTypedef permission;
-		regdatTypedef regdata;
-		pidk_Typedef reg_PID;
+	u8 machnum;
+	regstaTypedef regsta;
+	regperTypedef permission;
+	regdatTypedef regdata;
+	pidk_Typedef reg_PID;
 
-	}regMachTypedef;
+}regMachTypedef;
 
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

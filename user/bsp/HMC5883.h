@@ -44,6 +44,7 @@ typedef struct _HMC5883
 {
 	unsigned char *(*Read_Data)(unsigned char *pBuffer,unsigned char PartAddr,unsigned char WriteAddr,unsigned char NumByteToWrite);
 	unsigned char *(*Write_Data)(unsigned char *pBuffer,unsigned char PartAddr,unsigned char WriteAddr,unsigned char NumByteToWrite);
+
 }HMC5883Init_Typedef;
 
 
@@ -71,7 +72,7 @@ unsigned char getMode(void);
 short int getCompassX(void);
 short int getCompassZ(void);
 short int getCompassY(void);
-void getCompass3(short int* cx,short int* cy,short int*cz);
+void getCompass3(short int* cx,short int* cy,short int* cz);
 
 unsigned char getStatus(void);
 

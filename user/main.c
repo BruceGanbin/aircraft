@@ -37,11 +37,11 @@ int main(void)
 
   while(1)
   {
-//	ret = cmd_proc(&Reg_fly);
-//	if(ret) {  ret=0;}
-	getMotion6(&Data[0],&Data[1],&Data[2],&Data[3],&Data[4],&Data[5],&Data[6]);
+	  ret = cmd_proc(&Reg_fly);
+	  if(ret) {  ret=0;}
+	  getSensorData(&Reg_fly.regdata.sensor,Reg_fly.regsta);
 	}
-//  return 0;
+  //  return 0;
 } 
 
 /***************************************************************************************************
@@ -51,18 +51,12 @@ int main(void)
 ***************************************************************************************************/
 
 void bsp_init(void){
-  MPU6050Init_Typedef MPU6050_Config;
+
 	BT_InitTypedef BT_configure;
 
 
   Usart1_Ropen();	
   Usart2_Ropen();	
-
-	//Init  MPU6050
-  MPU6050_Config.Read_Data = IIC_ReadPage;
-  MPU6050_Config.Write_Data= IIC_WritePage;
-  Init_MPU6050(&MPU6050_Config);
-
   //Init bluetooth
   BT_configure.BT_ReadData=Usart2_Read;
   BT_configure.BT_SendData=Usart2_Send;
@@ -72,6 +66,7 @@ void bsp_init(void){
   BT_configure.BT_Disc=DISC_DIS_LNK;
   BT_configure.BT_LED=LED_FLASH;
   BT_Init(&BT_configure);
-
+  //init sensor
+  SensorInit();
 
 }
