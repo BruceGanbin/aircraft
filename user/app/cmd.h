@@ -7,10 +7,6 @@ extern "C" {
 #include "includes.h"
 
 
-
-
-
-
 	typedef struct _EVENT_CONTROL{
 
 		u8 chpowsta;    // power switch
@@ -49,7 +45,7 @@ extern "C" {
 	}traTypedef;
 #pragma pack()
 
-
+//#include "reg.h"
 	void reg_init(regMachTypedef *reg_mach);
 
 	char cmd_proc(regMachTypedef *reg_mach);

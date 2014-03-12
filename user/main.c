@@ -20,7 +20,7 @@ int main(void)
 
   
   u8 ret;
-	s16 Data[7]={0};
+//	s16 Data[7]={0};
   // config
   Init_error=RCC_Configuration();
   while(!Init_error){}
@@ -37,9 +37,9 @@ int main(void)
 
   while(1)
   {
-	  ret = cmd_proc(&Reg_fly);
-	  if(ret) {  ret=0;}
-	  getSensorData(&Reg_fly.regdata.sensor,Reg_fly.regsta);
+//	  ret = cmd_proc(&Reg_fly);
+//	  if(ret) {  ret=0;}
+	  getSensorData(&Reg_fly.regdata.sensor_da,Reg_fly.regsta);
 	}
   //  return 0;
 } 
@@ -53,6 +53,7 @@ int main(void)
 void bsp_init(void){
 
 	BT_InitTypedef BT_configure;
+  SensorInit();
 
 
   Usart1_Ropen();	
@@ -67,6 +68,5 @@ void bsp_init(void){
   BT_configure.BT_LED=LED_FLASH;
   BT_Init(&BT_configure);
   //init sensor
-  SensorInit();
 
 }

@@ -12,9 +12,10 @@
 #include  <stm32f10x_bus.h>
 //#include  <usart.h>
 //#include  <IIC.h>
-#include  <reg.h>
-#include  <MPU6050.h>
-#include  <cmd.h>
+
+#include  "reg.h"
+#include  "sensor.h"
+#include  "cmd.h"
 //#include  <general.h>
 
 

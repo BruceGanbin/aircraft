@@ -1,8 +1,8 @@
 #ifndef _REG_H
-#define  _REG_H
+#define _REG_H
 
-#include "includes.h"
-
+#include  "stm32f10x.h"
+//#include "sensor.h"
 // CONFIG-------------------------
 
 #define MACHNUM                '1'
@@ -67,9 +67,11 @@ typedef struct _REG_PER{
 
 #define DATA_NUM               9
 // data reg------------------------------
+//typedef struct {}SensorData_Typedef;
+#include  <sensor.h>
 typedef struct _REG_DATA{
-
-	SensorData_Typedef sensorData;
+  
+	SensorData_Typedef sensor_da;
 	 
 }regdatTypedef;
 
@@ -79,6 +81,9 @@ typedef struct _PIDK_TYPEDEF{
 	u16 ki;
 	u16 kd;
 }pidk_Typedef;
+
+
+
 
 // all reg  -----------------------------
 typedef struct _REG_MACH{
