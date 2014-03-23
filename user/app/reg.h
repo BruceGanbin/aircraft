@@ -2,10 +2,10 @@
 #define _REG_H
 
 #include  "stm32f10x.h"
-//#include "sensor.h"
+#include  "config.h"
 // CONFIG-------------------------
 
-#define MACHNUM                '1'
+//#define MACHNUM                '1'
 
 
 // init status reg
@@ -49,14 +49,14 @@ typedef struct _REG_STATUS{
 	u8 led_sta;
 	u8 motor_sta;
 	u8 sensor_sta;
-	u8 orien_sta;
+	//	u8 orien_sta;
 	   
 }regstaTypedef;
 /******
-         |  bit7  |  bit6  |  bit5  |  bit4  |  bit3  |  bit2  |  bit1  |  bit0  |
-led_sta  |reserive|
-
-
+              |  bit7  |  bit6  |  bit5  |  bit4  |  bit3  |  bit2  |  bit1  |  bit0  |
+led_sta       |reserive|reserive|reserive| LED_EN |LED4_STA|LED3_STA|LED2_STA|LED1_STA|
+motor_sta     |reserive|reserive|reserive|MOTOR_EN|MOT4_STA|MOT3_STA|MOT2_STA|MOT1_STA|
+sensor_sta    |reserive|reserive|reserive|reserive|reserive|reserive|reserive|SENSO_EN|
 
 ******/
 
@@ -68,12 +68,6 @@ typedef struct _REG_PER{
 #define DATA_NUM               9
 // data reg------------------------------
 //typedef struct {}SensorData_Typedef;
-#include  <sensor.h>
-typedef struct _REG_DATA{
-  
-	SensorData_Typedef sensor_da;
-	 
-}regdatTypedef;
 
 //pidk data reg
 typedef struct _PIDK_TYPEDEF{
@@ -82,6 +76,13 @@ typedef struct _PIDK_TYPEDEF{
 	u16 kd;
 }pidk_Typedef;
 
+#include  <sensor.h>
+typedef struct _REG_DATA{
+  
+	SensorData_Typedef sensor_da;
+	pidk_Typedef reg_PID;
+	 
+}regdatTypedef;
 
 
 
@@ -90,9 +91,8 @@ typedef struct _REG_MACH{
 
 	u8 machnum;
 	regstaTypedef regsta;
-	regperTypedef permission;
 	regdatTypedef regdata;
-	pidk_Typedef reg_PID;
+	regperTypedef permission;
 
 }regMachTypedef;
 

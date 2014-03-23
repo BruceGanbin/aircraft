@@ -22,10 +22,11 @@ char cmd_proc(regMachTypedef *reg_mach)
 	if(Cmd_Sta==LINKLOST){	Cmd_pData = Usart1_Read(&Cmd_Num,0);  }
 
 	// process command
-	if(Cmd_Num == 6)
+	if(Cmd_Num >= 6)
 	{
-		Cmd_Frame    = (cmdTypedef*)Cmd_pData;
-		//		Cmd_Transmit = (traTypedef*)transmit;
+
+		 Cmd_Frame    = (cmdTypedef*)Cmd_pData;
+	
 
 
 		if(Cmd_Frame->MachineNum != reg_mach->machnum)  return 0;
@@ -36,24 +37,24 @@ char cmd_proc(regMachTypedef *reg_mach)
 		//if right machine number 
 		switch(Cmd_Frame->Funcode){
 
-		case '1': //read status reg
-			Cmd_ret = cmd_readsta(Cmd_Frame->Reg,&reg_mach->regsta,Cmd_Transmit.data,Cmd_Frame->len);
-			tra_Num = 4+Cmd_Frame->len;
+		case CMD_READSTA: //read status reg
+			Cmd_ret = cmd_readsta(Cmd_Frame->Reg,&reg_mach->regsta,Cmd_Transmit.data,Cmd_Frame->len_data.len);
+			tra_Num = 4+Cmd_Frame->len_data.len;
 			break;
 		 
-		case 3: //read  data reg 
-			Cmd_ret = cmd_readdat(Cmd_Frame->Reg,&reg_mach->regdata,Cmd_Transmit.data,Cmd_Frame->len);
-			tra_Num = 4+Cmd_Frame->len;
+		case CMD_READDATA: //read  data reg 
+			Cmd_ret = cmd_readdat(Cmd_Frame->Reg,&reg_mach->regdata,Cmd_Transmit.data,Cmd_Frame->len_data.len);
+			tra_Num = 4+Cmd_Frame->len_data.len;
 			break;
 
 		 
-		case 5: //set switch state reg
-			Cmd_ret =  cmd_setsta(Cmd_Frame->Reg,&reg_mach->regsta,(u8)Cmd_Frame->len,reg_mach->permission);
+		case CMD_SETSTA: //set switch state reg
+			Cmd_ret =  cmd_setsta(Cmd_Frame->Reg,&reg_mach->regsta,(u8)Cmd_Frame->len_data.len,reg_mach->permission);
 			tra_Num = 4;
 			break;
 		
-		case 6: //set  data reg
-			Cmd_ret =  cmd_setdat(Cmd_Frame->Reg,&reg_mach->regdata,Cmd_Frame->len,reg_mach->permission);
+		case CMD_SETDATA: //set  data reg
+			Cmd_ret =  cmd_setdat(Cmd_Frame->Reg,&reg_mach->regdata,Cmd_Frame->len_data.data,Cmd_Num-4,reg_mach->permission);
 			tra_Num = 4;
 			break;
 
@@ -63,7 +64,7 @@ char cmd_proc(regMachTypedef *reg_mach)
 
 		//  transmit
 
-		Cmd_Transmit.len = Cmd_Frame->len;
+		Cmd_Transmit.len = Cmd_Frame->len_data.len;
 		pTransmit = (char*)&Cmd_Transmit;
 
 		if(Cmd_Sta == LINKOK){ Usart2_Send(pTransmit,tra_Num); }
@@ -84,16 +85,46 @@ char cmd_proc(regMachTypedef *reg_mach)
 
 char cmd_setsta(u16 reg,regstaTypedef *regsta,u8 sData,regperTypedef permission)    // set one switch reg
 {
+	switch(reg)
+	{
+	case REG_LED : 	 regsta->led_sta = sData;
+		break;
+	case REG_MOTOR:  regsta->motor_sta = sData;
+		break;
+	case REG_SENSOR: regsta->sensor_sta = sData;
+		break;
+	default:      return 0;
 	
-	*((u8*)regsta+reg) = sData;
+	}
+
 	return 1;
 }
 
 
-char cmd_setdat(u16 reg,regdatTypedef *regdat,u16 sData,regperTypedef permission)    // set data reg
+char cmd_setdat(u16 reg,regdatTypedef *regdat,u8 *sData,u16 len,regperTypedef permission)    // set data reg
 {
+	u8 *pData;
+	u8 i=0;
+	switch(reg)
+	{
+/*	case REG_LED :    
+		break;
+	case REG_MOTOR:    	
+		break;   
+	case REG_SENSOR:     (pData =(u16 *)&regdat->sensor_da;
+		break; */
+	case REG_PID:          pData =(u8 *)&regdat->reg_PID ; //= *sData;
+											  for(i=0;i<len;i++)
+			                     {
+															pData = sData;
+															pData++;
+														  sData++;
+														}
+			break;										
+	default:   return 0;
+		
+	}
 
-	*((u16*)regdat+reg) = sData;
 	return 1;
 }
 
@@ -102,8 +133,18 @@ char cmd_setdat(u16 reg,regdatTypedef *regdat,u16 sData,regperTypedef permission
 char cmd_readsta(u16 reg,regstaTypedef *regsta,u8 *rData,u16 len)  // read one swi reg
 {
 	u8 *preg;
+	switch(reg)
+	{
+	case REG_LED :    	preg = (u8*)&regsta->led_sta;
+		break;
+	case REG_MOTOR:     preg = (u8*)&regsta->motor_sta;
+		break;
+	case REG_SENSOR:	  preg = (u8*)&regsta->sensor_sta;
+		break;
+	default:    return 0;
+		
+	}	
 
-	preg = (u8*)regsta+reg;
 	memcpy(rData,preg,len);
 
 	return 1;
@@ -114,8 +155,18 @@ char cmd_readsta(u16 reg,regstaTypedef *regsta,u8 *rData,u16 len)  // read one s
 char cmd_readdat(u16 reg,regdatTypedef *regdat,u8 *rData,u16 len)  // read one data reg
 {
 	u16 *preg;
+	switch(reg)
+	{
+/*	case REG_LED :  	preg = (u16*)regdat->led;
+		break;
+	case REG_MOTOR:     preg = (u16*)regdat->motor;
+		break;  */
+	case REG_SENSOR:    preg = (u16*)&regdat->sensor_da;
+		break;
+	default:
+		break;
+	}
 
-	preg = (u16*)regdat+reg;
 	memcpy(rData,preg,len);
 
 	return 1;

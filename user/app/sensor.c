@@ -21,11 +21,24 @@ void SensorInit(void)
 void getSensorData(SensorData_Typedef *pSensorData,regstaTypedef sta)
 {
 //	short int Data[10];
+	u8 i;
+	s16 *pData;
+	*pData = pSensorData->Ac_X;
 
-
-	getMotion6(&pSensorData->Ac_X,&pSensorData->Ac_Y,&pSensorData->Ac_Z,&pSensorData->GY_X,&pSensorData->GY_Y,&pSensorData->GY_Z,&pSensorData->Temper);
+	if(sta.sensor_sta==0)
+	{
+		for(i=0;i<10;i++)
+		{
+			*pData = 0;
+			pData++;
+		}
+		return;
+	}
+	getMotion6(&pSensorData->Ac_X,&pSensorData->Ac_Y,&pSensorData->Ac_Z,   \
+							&pSensorData->GY_X,&pSensorData->GY_Y,&pSensorData->GY_Z,  \
+							&pSensorData->Temper);
+	
 	getCompass3(&pSensorData->Cm_X,&pSensorData->Cm_Y,&pSensorData->Cm_Z);
-
 
 }
 

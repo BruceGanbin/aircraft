@@ -6,6 +6,7 @@ static unsigned char *(*Single_read)(unsigned char *pBuffer,unsigned char PartAd
 static unsigned char *(*Single_write)(unsigned char *pBuffer,unsigned char PartAddr,     \
 										 unsigned char WriteAddr,unsigned char NumByteToWrite);
 
+
 char HMC5883_swrite(unsigned char WriteAddr,unsigned char data)
 {
 	Single_write(&data,HMC5883_ADDRESS,WriteAddr,1);
@@ -20,21 +21,11 @@ char HMC5883_sread(unsigned char WriteAddr)
 
 void Init_HMC5883(HMC5883Init_Typedef *HMC5883_Config)
 {
-	unsigned char value[15]={0};
 	Single_read = HMC5883_Config->Read_Data;
-	Single_write= HMC5883_Config->Write_Data;
-	Single_read(value,HMC5883_ADDRESS,0x00,15);
-//	value[0]=HMC5883_sread(HMC5883_IDEN_A);
-//	value[1]=HMC5883_sread(HMC5883_IDEN_A);
-//	value[2]=HMC5883_sread(HMC5883_MODE);
-//	HMC5883_swrite(HMC5883_MODE,0x04);
-//	value[0]=HMC5883_sread(HMC5883_MODE);
-	while(value[0]==0);
+  Single_write= HMC5883_Config->Write_Data;
 	HMC5883_swrite(HMC5883_CONFIG_A,0x70);
   HMC5883_swrite(HMC5883_CONFIG_B,0x00);
-	HMC5883_swrite(0x02,0x00);
-
-	Single_read(value,HMC5883_ADDRESS,0x00,15);
+	HMC5883_swrite(HMC5883_MODE,0x00);
 }
 
 //config register A
