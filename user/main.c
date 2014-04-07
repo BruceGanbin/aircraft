@@ -39,7 +39,7 @@ int main(void)
 	{
 		ret = cmd_proc(&Reg_fly);
 		getSensorData(&Reg_fly.regdata.sensor_da,Reg_fly.regsta);
-	  
+	  delayms(50);
 	}
 	//  return 0;
 } 

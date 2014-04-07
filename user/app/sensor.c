@@ -23,9 +23,9 @@ void getSensorData(SensorData_Typedef *pSensorData,regstaTypedef sta)
 //	short int Data[10];
 	u8 i;
 	s16 *pData;
-	*pData = pSensorData->Ac_X;
+	pData = (s16 *)&pSensorData->Ac_X;
 
-	if(sta.sensor_sta==0)
+	if(sta.sensor_sta == 0x00)
 	{
 		for(i=0;i<10;i++)
 		{

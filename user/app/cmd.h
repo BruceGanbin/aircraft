@@ -57,7 +57,7 @@ extern "C" {
 		u8  MachineNum;
 		u8  Funcode;
 		u16 len;
-		u8 data[10];
+		u8 data[50];
 	}traTypedef;
 	
 #pragma pack()

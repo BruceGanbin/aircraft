@@ -14,7 +14,7 @@ char cmd_proc(regMachTypedef *reg_mach)
 	u8   tra_Num=0;
 	char  *pTransmit;
 	cmdTypedef *Cmd_Frame;
-	traTypedef Cmd_Transmit;
+	traTypedef Cmd_Transmit={0};
 
 
 	// change the cmd data come from
@@ -27,13 +27,13 @@ char cmd_proc(regMachTypedef *reg_mach)
 
 		 Cmd_Frame    = (cmdTypedef*)Cmd_pData;
 	
-
-
 		if(Cmd_Frame->MachineNum != reg_mach->machnum)  return 0;
 
 		Cmd_Transmit.MachineNum = Cmd_Frame->MachineNum;
 		Cmd_Transmit.Funcode    = Cmd_Frame->Funcode;
-
+		if(Cmd_Num == 6) Cmd_Transmit.len = Cmd_Frame->len_data.len;
+		else		Cmd_Transmit.len = Cmd_Num-4;
+		
 		//if right machine number 
 		switch(Cmd_Frame->Funcode){
 
@@ -64,18 +64,14 @@ char cmd_proc(regMachTypedef *reg_mach)
 
 		//  transmit
 
-		Cmd_Transmit.len = Cmd_Frame->len_data.len;
+
 		pTransmit = (char*)&Cmd_Transmit;
 
 		if(Cmd_Sta == LINKOK){ Usart2_Send(pTransmit,tra_Num); }
 		else Usart1_Send(pTransmit,tra_Num);
 
-
 	}
 	else  Cmd_ret = 0;
-
-
-
 
 	return Cmd_ret;
 }
@@ -163,6 +159,7 @@ char cmd_readdat(u16 reg,regdatTypedef *regdat,u8 *rData,u16 len)  // read one d
 		break;  */
 	case REG_SENSOR:    preg = (u16*)&regdat->sensor_da;
 		break;
+	case REG_PID:       preg = (u16*)&regdat->reg_PID;
 	default:
 		break;
 	}
