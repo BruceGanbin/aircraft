@@ -38,9 +38,9 @@
 #define led4_pin                    (GPIO_Pin_6)
 
 static struct rt_timer timer1;
-static struct rt_timer timer2;
-static struct rt_timer timer3;
-static struct rt_timer timer4;
+//static struct rt_timer timer2;
+//static struct rt_timer timer3;
+//static struct rt_timer timer4;
 
 // sorft timer interrupt
 static rt_uint8_t ledstart = 0;
@@ -115,9 +115,9 @@ void rt_hw_led_init(void)
     GPIO_Init(led1_gpio, &GPIO_InitStructure);
 
     rt_timer_init(&timer1,"timer1",timeout_led1,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
-    rt_timer_init(&timer2,"timer2",timeout_led2,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
-    rt_timer_init(&timer3,"timer3",timeout_led3,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
-    rt_timer_init(&timer4,"timer4",timeout_led4,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
+    //    rt_timer_init(&timer2,"timer2",timeout_led2,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
+    //    rt_timer_init(&timer3,"timer3",timeout_led3,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
+    //    rt_timer_init(&timer4,"timer4",timeout_led4,RT_NULL,100,RT_TIMER_FLAG_PERIODIC);
 
     //turn off  all the led
     rt_hw_led_off(99);
@@ -265,24 +265,24 @@ void led_flash(rt_uint32_t led,rt_uint32_t freq)
             set_timer = &timer1;
             break;
 
-        case 1:
-            set_timer = &timer2;
-            break;
-
-        case 2:
-            set_timer = &timer3;
-            break;
-
-        case 3:
-            set_timer = &timer4;
-            break;
-
-        default:
-            rt_timer_stop(&timer1);
-            rt_timer_stop(&timer2);
-            rt_timer_stop(&timer3);
-            rt_timer_stop(&timer4);
-            return;
+//        case 1:
+//            set_timer = &timer2;
+//            break;
+// 
+//        case 2:
+//            set_timer = &timer3;
+//            break;
+// 
+//        case 3:
+//            set_timer = &timer4;
+//            break;
+// 
+//        default:
+//            rt_timer_stop(&timer1);
+//            rt_timer_stop(&timer2);
+//            rt_timer_stop(&timer3);
+//            rt_timer_stop(&timer4);
+//            return;
         }
 
 

@@ -14,7 +14,7 @@ i2c.c
 mpu6050.c
 HMC5883.c
 pwm.c
-atbluetooth.c
+atcommand.c
 """)
 
 # add Ethernet drvers.

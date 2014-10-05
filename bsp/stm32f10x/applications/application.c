@@ -41,6 +41,8 @@
 #endif
 
 #include "led.h"
+#include "bt_parse.h"
+#include "atcommand.h"
 
 ALIGN(RT_ALIGN_SIZE)
 
@@ -64,12 +66,13 @@ void cali_store(struct calibration_data *data)
 void rt_init_thread_entry(void* parameter)
 {
     /* init board */
-    rt_hw_led_init();
+    //    rt_hw_led_init();
     I2C_init();
     Init_MPU6050();
     HMC5883L_Initialize();
     pwm_init();
-    bt_application_init();
+    at_application_init();
+    
 #ifdef RT_USING_COMPONENTS_INIT
     /* initialization RT-Thread Components */
     rt_components_init();
@@ -123,7 +126,7 @@ void rt_init_thread_entry(void* parameter)
     }
 #endif /* #ifdef RT_USING_RTGUI */
 
-    
+    BT_application_init();
 }
 
 int rt_application_init(void)
