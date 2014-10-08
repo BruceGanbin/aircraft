@@ -72,11 +72,11 @@ static void at_thread(void* parameter)
 
     while(1)
     {
-        result_sem = rt_sem_take(BT_sem,RT_WAITING_FOREVER);//50);
+        result_sem = rt_sem_take(BT_sem,RT_WAITING_FOREVER);
         if(result_sem == RT_EOK)
         {
             memset(rx_buf.uart_rx_buffer,0,AT_BUF_MAX);
-            //            rt_kprintf("clean uart_buff \n");
+//          rt_kprintf("clean uart_buff \n");
             rx_buf.size = 0;
         }
 
@@ -89,8 +89,7 @@ static void at_thread(void* parameter)
                 length_rx = rt_device_read(device, 0, rx_buf.uart_rx_buffer,AT_BUF_MAX);
                 if(length_rx > 0)
                 {
-                    //                    rt_kprintf("Receive length %d\n",length_rx);
-                    //                    rt_kprintf("BT_Receive Data: %s\n",rx_buf.uart_rx_buffer);
+//                  rt_kprintf("BT_Receive Data: %s\n",rx_buf.uart_rx_buffer);
                     rx_buf.size = length_rx;
                     rt_sem_release(BT_sem);
                     result_sem = !RT_EOK;
@@ -112,7 +111,7 @@ void at_application_init(void)
 
     rt_thread_t thread = rt_thread_create("at_cmd",
                                           at_thread, RT_NULL,
-                                          1024, 25, 7);
+                                          1024, 25, 10);
 
     if(thread != RT_NULL)
     {

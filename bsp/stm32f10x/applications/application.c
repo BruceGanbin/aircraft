@@ -68,10 +68,11 @@ void rt_init_thread_entry(void* parameter)
     /* init board */
     //    rt_hw_led_init();
     I2C_init();
+    pwm_init();
     Init_MPU6050();
     HMC5883L_Initialize();
-    pwm_init();
-    at_application_init();
+
+    //    at_application_init();
     
 #ifdef RT_USING_COMPONENTS_INIT
     /* initialization RT-Thread Components */
@@ -126,6 +127,7 @@ void rt_init_thread_entry(void* parameter)
     }
 #endif /* #ifdef RT_USING_RTGUI */
 
+    at_application_init();
     BT_application_init();
 }
 
