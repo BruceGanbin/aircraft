@@ -39,6 +39,8 @@
 #define BT_NOTI_N          "0"
 #define BT_NOTI_Y          "1"
 
+#define BT_LINK_UP          1
+#define BT_LINK_DOWN        0
 /* BT configuration*/
 #define BT_NAME            "minifly"
 
@@ -80,7 +82,6 @@ typedef enum
 //int BT_thread_init(void);
 void BT_application_init(void);
 
-//unsigned char BT_chklink(void);
-unsigned char BT_chklink(char *para,rt_size_t num);
+unsigned char BT_chklink(void);
 
 void BT_send(char *pdata);

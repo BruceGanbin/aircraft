@@ -17,25 +17,66 @@ BT_parameter BT_para;
 BT_LINK_ST BT_link_st;
 
 extern rx_buf_type rx_buf;
+static unsigned char  link_st = BT_LINK_DOWN;
 
 static void bt_send(char *pdata)
 {
     at_send(pdata);
 }
 
-unsigned char BT_chklink(char *para,rt_size_t num)
+/*
+check BT link status , >0 link up ,=0 link down
+ */
+//unsigned char BT_chklink(char *dat,rt_size_t num)
+unsigned char bt_chklink(void)
 {
-    if(num == 12 || num == 13)
+    if(link_st == BT_LINK_UP)
+        rt_kprintf("CHK BT_link up\n");
+    else
+        rt_kprintf("CHK BT_link down\n");
+    return link_st;
+}
+#ifdef RT_USING_FINSH
+#include <finsh.h>
+FINSH_FUNCTION_EXPORT(bt_chklink,check BT link stauts.)
+#endif
+
+unsigned char BT_parse(char *dat,rt_size_t num)
+{
+    int ret;
+    char *head;
+    head = dat;
+    /* check link status */
+    if(num == 7)
+    {
+        ret = strcmp(head,"OK+CONN");
+        if(ret == 0)
+        {
+            link_st = BT_LINK_UP;
+            rt_kprintf("link up\n");
+            return 1;
+        }
+        ret = strcmp(head,"OK+LOST");
+        if(ret == 0)
+        {
+            link_st = BT_LINK_DOWN;
+            rt_kprintf("link down\n");
+            return 1;
+        }    
+    }
+
+    /* data  */
+    if(link_st == BT_LINK_UP)
+    {
+
+
+    }
+    else
     {
 
     }
-
+        
     return RT_NULL;
-}
-
-unsigned char BT_da_parse(void)
-{
-return RT_NULL;
 }
 
 char *BT_receive(void)
@@ -69,7 +110,6 @@ char* BT_cmd_send(char *cmd)
 
 }
 
-
 char *BT_at_parse(char *para)
 {
     unsigned char num=0;
@@ -84,7 +124,7 @@ char *BT_at_parse(char *para)
     return presult;
 }
 
-int bt_strcmp(char *cmd,char *reply)
+int bt_rcmdcmp(char *cmd,char *reply)
 {
     char *red;
     int ret;
@@ -139,71 +179,71 @@ void bt_read(void)
     memset(BT_para.name,0,BT_NAME_LEN);
     memset(BT_para.pin,0,BT_PIN_LEN);
 
-    ret = bt_strcmp("AT","OK");
+    ret = bt_rcmdcmp("AT","OK");
     if(ret != 0)
     {
         rt_kprintf("Bluetooth ACK error!\n");
         return;
     }
 
-    // check uart configuration
-    ret = bt_strcmp("AT+BAUD?","9600");
+    /* check uart configuration */
+    ret = bt_rcmdcmp("AT+BAUD?","9600");
     if(ret != 0 )
     {
         rt_kprintf("baudrate error!\n");
         bt_setting("AT+BAUD",BT_BAUD_9600);
     }
 
-    ret = bt_strcmp("AT+CHK?",BT_CHK_NONE);
+    ret = bt_rcmdcmp("AT+CHK?",BT_CHK_NONE);
     if(ret != 0 )
     {
         rt_kprintf("check error!\n");
         bt_setting("AT+CHK",BT_CHK_NONE);
     }
 
-    ret = bt_strcmp("AT+STOP?",BT_STOP_1BIT);
+    ret = bt_rcmdcmp("AT+STOP?",BT_STOP_1BIT);
     if(ret != 0 )
     {
         rt_kprintf("stop error!\n");
         bt_setting("AT+STOP",BT_STOP_1BIT);
     }
 
-    // check bluetooth configuration
-    ret = bt_strcmp("AT+NAME?",BT_NAME);
+    /* check bluetooth configuration */
+    ret = bt_rcmdcmp("AT+NAME?",BT_NAME);
     if(ret != 0 )
     {
         rt_kprintf("name error!\n");
         bt_setting("AT+NAME",BT_NAME);
     }
 
-    ret = bt_strcmp("AT+ROLE?",BT_ROLE);
+    ret = bt_rcmdcmp("AT+ROLE?",BT_ROLE);
     if(ret != 0 )
     {
         rt_kprintf("ROLE error!\n");
         bt_setting("AT+ROLE",BT_ROLE);
     }
 
-    ret = bt_strcmp("AT+PIN?",BT_PIN);
+    ret = bt_rcmdcmp("AT+PIN?",BT_PIN);
     if(ret != 0 )
     {
         rt_kprintf("PIN error!\n");
         bt_setting("AT+PIN",BT_PIN);
     }
 
-    ret = bt_strcmp("AT+AUTH?",BT_AUTH);
+    ret = bt_rcmdcmp("AT+AUTH?",BT_AUTH);
     if(ret != 0 )
     {
         rt_kprintf("AUTH error!\n");
         bt_setting("AT+PIN",BT_AUTH);
     }
 
-    ret = bt_strcmp("AT+NOTI?",BT_NOTI_Y);
+    ret = bt_rcmdcmp("AT+NOTI?",BT_NOTI_Y);
     if(ret != 0 )
     {
         rt_kprintf("Notification error!\n");
         bt_setting("AT+NOTI",BT_NOTI_Y);
     }
-    
+    rt_kprintf("BT init config OK!\n");    
 }
 #ifdef RT_USING_FINSH
 #include <finsh.h>
@@ -227,7 +267,7 @@ void bt_test(char *cmd)
 }
 #ifdef RT_USING_FINSH
 #include <finsh.h>
-FINSH_FUNCTION_EXPORT(bt_test,send data to bluetooth .)
+FINSH_FUNCTION_EXPORT(bt_test,send AT cmd to bluetooth receive data.)
 #endif
 
 
@@ -246,8 +286,10 @@ void BT_thread_init(void *parameter)
         result = rt_sem_take(BT_sem,RT_WAITING_FOREVER);
         while(result == RT_EOK )//&& rx_buf.size > 0)
         {
-//            BT_chklink(rx_buf.uart_rx_buffer,rx_buf.size);
+            //            BT_chklink(rx_buf.uart_rx_buffer,rx_buf.size);
+            
             rt_kprintf("data:%s \n",rx_buf.uart_rx_buffer);
+            BT_parse(rx_buf.uart_rx_buffer,rx_buf.size);
             rt_sem_release(BT_sem);
             result = !RT_EOK;
             rt_thread_delay(5);
