@@ -8,7 +8,13 @@ unsigned char *(*Single_write)(unsigned char *pBuffer,unsigned char PartAddr,   
 										 unsigned char WriteAddr,unsigned char NumByteToWrite);
 
 
+static short int offset_acc_x = 0;
+static short int offset_acc_y = 0;
+static short int offset_acc_z = 0;
 
+static short int offset_gyro_x = -218;
+static short int offset_gyro_y = 172;
+static short int offset_gyro_z = -3;
 
 /**
 
@@ -54,8 +60,8 @@ void Init_MPU6050(void)
   MPU6050_swrite(PWR_MGMT_1,0x00);
   MPU6050_swrite(SMPLRT_DIV,0x07);
   MPU6050_swrite(CONFIG,0x06);
-  MPU6050_swrite(GYRO_CONFIG,0x18);
-  MPU6050_swrite(ACCEL_CONFIG,0x01);
+  MPU6050_swrite(GYRO_CONFIG,0x08);
+  MPU6050_swrite(ACCEL_CONFIG,0x08);
 
 }
 
@@ -329,8 +335,8 @@ void rd_mpu(void)
 
     Read_MPU6050AG(&Senser_Data);
     
-    rt_kprintf("Accel_X :%d   ,Accel_Y :%d   ,Accel_Z :%d\n",Senser_Data.AccelX,Senser_Data.AccelY,Senser_Data.AccelZ);
-    rt_kprintf("Gyro_X :%d    ,Gyro :%d      ,Gyro :%d\n"   ,Senser_Data.GYROX, Senser_Data.GYROY, Senser_Data.GYROZ);
+    rt_kprintf("Accel_X :%x   ,Accel_Y :%x   ,Accel_Z :%x\n",Senser_Data.AccelX,Senser_Data.AccelY,Senser_Data.AccelZ);
+    rt_kprintf("Gyro_X :%x    ,Gyro :%x      ,Gyro :%x\n"   ,Senser_Data.GYROX, Senser_Data.GYROY, Senser_Data.GYROZ);
     rt_kprintf("Temperature :%d \n",Senser_Data.TEMPER);
 }
 #ifdef RT_USING_FINSH

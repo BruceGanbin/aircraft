@@ -42,7 +42,7 @@
 #define BT_LINK_UP          1
 #define BT_LINK_DOWN        0
 /* BT configuration*/
-#define BT_NAME            "minifly"
+#define BT_NAME            "B1-minifly"
 
 #define BT_ROLE            BT_ROLE_SLAVE
 
@@ -79,9 +79,9 @@ typedef enum
     LINK_DOWN
 }BT_LINK_ST;
 
-//int BT_thread_init(void);
 void BT_application_init(void);
 
 unsigned char BT_chklink(void);
 
 void BT_send(char *pdata);
+char bt_setting(char *cmd,char *dat);
