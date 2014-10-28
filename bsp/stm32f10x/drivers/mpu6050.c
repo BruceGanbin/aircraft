@@ -12,9 +12,9 @@ static short int offset_acc_x = 0;
 static short int offset_acc_y = 0;
 static short int offset_acc_z = 0;
 
-static short int offset_gyro_x = -218;
-static short int offset_gyro_y = 172;
-static short int offset_gyro_z = -3;
+static short int offset_gyro_x = -145;
+static short int offset_gyro_y = 207;
+static short int offset_gyro_z = -10;
 
 /**
 
@@ -293,15 +293,15 @@ void Read_MPU6050AG(MPU6050AGVALUE_Typedef *pAg_value)
     unsigned char tmp[14]={0};
 
     MPU6050_read(ACCEL_XOUT_H,tmp,14);
-    pAg_value->AccelX=(tmp[0]<<8)|tmp[1];
-    pAg_value->AccelY=(tmp[2]<<8)|tmp[3];
-    pAg_value->AccelZ=(tmp[4]<<8)|tmp[5];
+    pAg_value->AccelX=((tmp[0]<<8)|tmp[1]) - offset_acc_x;
+    pAg_value->AccelY=((tmp[2]<<8)|tmp[3]) - offset_acc_y;
+    pAg_value->AccelZ=((tmp[4]<<8)|tmp[5]) - offset_acc_z;
     
     pAg_value->TEMPER=(tmp[6]<<8)|tmp[7];
 
-    pAg_value->GYROX=(tmp[8]<<8)|tmp[9];
-    pAg_value->GYROY=(tmp[10]<<8)|tmp[11];
-    pAg_value->GYROZ=(tmp[12]<<8)|tmp[13];
+    pAg_value->GYROX=((tmp[8]<<8)|tmp[9]) - offset_gyro_x;
+    pAg_value->GYROY=((tmp[10]<<8)|tmp[11])- offset_gyro_y;
+    pAg_value->GYROZ=((tmp[12]<<8)|tmp[13])- offset_gyro_z;
 }
 
 void rd_simpu(void)
@@ -335,8 +335,8 @@ void rd_mpu(void)
 
     Read_MPU6050AG(&Senser_Data);
     
-    rt_kprintf("Accel_X :%x   ,Accel_Y :%x   ,Accel_Z :%x\n",Senser_Data.AccelX,Senser_Data.AccelY,Senser_Data.AccelZ);
-    rt_kprintf("Gyro_X :%x    ,Gyro :%x      ,Gyro :%x\n"   ,Senser_Data.GYROX, Senser_Data.GYROY, Senser_Data.GYROZ);
+    rt_kprintf("Accel_X :%d   ,Accel_Y :%d   ,Accel_Z :%d\n",Senser_Data.AccelX,Senser_Data.AccelY,Senser_Data.AccelZ);
+    rt_kprintf("Gyro_X :%d    ,Gyro :%d      ,Gyro :%d\n"   ,Senser_Data.GYROX, Senser_Data.GYROY, Senser_Data.GYROZ);
     rt_kprintf("Temperature :%d \n",Senser_Data.TEMPER);
 }
 #ifdef RT_USING_FINSH
