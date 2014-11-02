@@ -1,6 +1,7 @@
 #include "mpu6050.h"
 #include "i2c.h"
 #include <rtthread.h>
+#include <string.h>
 
 unsigned char *(*Single_read)(unsigned char *pBuffer,unsigned char PartAddr,      \
 										unsigned char WriteAddr,unsigned char NumByteToWrite);
@@ -8,7 +9,15 @@ unsigned char *(*Single_write)(unsigned char *pBuffer,unsigned char PartAddr,   
 										 unsigned char WriteAddr,unsigned char NumByteToWrite);
 
 
+static short int offset_acc_x = 0;
+static short int offset_acc_y = 0;
+static short int offset_acc_z = 0;
 
+static short int offset_gyro_x = -145;
+static short int offset_gyro_y = 207;
+static short int offset_gyro_z = -10;
+
+static MPU6050value_typedef Value_buf;
 
 /**
 
@@ -40,23 +49,22 @@ void MPU6050_read(unsigned char WriteAddr,unsigned char *pData,unsigned char Num
 //void Init_MPU6050(MPU6050Init_Typedef *MPU6050_Config)
 void Init_MPU6050(void)
 {
-  unsigned char Rdata[5]={0};
-  unsigned char MPU_ID=0;
-  //  Single_read = MPU6050_Config->Read_Data;
-  //  Single_write= MPU6050_Config->Write_Data;
+    unsigned char Rdata[5]={0};
+    unsigned char MPU_ID=0;
+    //  Single_read = MPU6050_Config->Read_Data;
+    //  Single_write= MPU6050_Config->Write_Data;
 
-  MPU_ID=getDeviceID();
-  if(MPU_ID == 0x68)
-      rt_kprintf("MPU6050 init OK!\n");
-  else
-      rt_kprintf("MPU6050 init ERROR!\n");
-  //  MPU6050_swrite(PWR_MGMT_1,0x07);
-  MPU6050_swrite(PWR_MGMT_1,0x00);
-  MPU6050_swrite(SMPLRT_DIV,0x07);
-  MPU6050_swrite(CONFIG,0x06);
-  MPU6050_swrite(GYRO_CONFIG,0x18);
-  MPU6050_swrite(ACCEL_CONFIG,0x01);
-
+    MPU_ID=getDeviceID();
+    if(MPU_ID == 0x68)
+        rt_kprintf("MPU6050 init OK!\n");
+    else
+        rt_kprintf("MPU6050 init ERROR!\n");
+    //  MPU6050_swrite(PWR_MGMT_1,0x07);
+    MPU6050_swrite(PWR_MGMT_1,0x00);
+    MPU6050_swrite(SMPLRT_DIV,0x07);
+    MPU6050_swrite(CONFIG,0x06);
+    MPU6050_swrite(GYRO_CONFIG,0x08);
+    MPU6050_swrite(ACCEL_CONFIG,0x08);
 }
 
 
@@ -249,9 +257,6 @@ short int tgetgyroscopeZ(void);
 
 void getMotion6(short int* ax,short int* ay,short int* az,short int* gx,short int* gy,short int* gz);
 
-//void Read_MPU6050AG(MPU6050AGVALUE_Typedef *pAg_value);
-
-
 // SIGNAL_PATH_RESET register
 void resetGyroscopePath(void);
 void resetAccelerometerPath(void);
@@ -282,25 +287,33 @@ void resetSensors(void);
 /**
 
 ****/
-void Read_MPU6050AG(MPU6050AGVALUE_Typedef *pAg_value)
+void Read_MPU6050AG(MPU6050value_typedef *pAg_value)
 {
     unsigned char tmp[14]={0};
 
     MPU6050_read(ACCEL_XOUT_H,tmp,14);
-    pAg_value->AccelX=(tmp[0]<<8)|tmp[1];
-    pAg_value->AccelY=(tmp[2]<<8)|tmp[3];
-    pAg_value->AccelZ=(tmp[4]<<8)|tmp[5];
+    pAg_value->AccelX=((tmp[0]<<8)|tmp[1]) - offset_acc_x;
+    pAg_value->AccelY=((tmp[2]<<8)|tmp[3]) - offset_acc_y;
+    pAg_value->AccelZ=((tmp[4]<<8)|tmp[5]) - offset_acc_z;
     
     pAg_value->TEMPER=(tmp[6]<<8)|tmp[7];
 
-    pAg_value->GYROX=(tmp[8]<<8)|tmp[9];
-    pAg_value->GYROY=(tmp[10]<<8)|tmp[11];
-    pAg_value->GYROZ=(tmp[12]<<8)|tmp[13];
+    pAg_value->GYROX=((tmp[8]<<8)|tmp[9]) - offset_gyro_x;
+    pAg_value->GYROY=((tmp[10]<<8)|tmp[11])- offset_gyro_y;
+    pAg_value->GYROZ=((tmp[12]<<8)|tmp[13])- offset_gyro_z;
+
+    memcpy(&Value_buf,pAg_value,sizeof(MPU6050value_typedef));
 }
+
+void get_MPU6050(MPU6050value_typedef *pValue)
+{
+    memcpy(pValue,&Value_buf,sizeof(MPU6050value_typedef));
+}
+
 
 void rd_simpu(void)
 {
-    MPU6050AGVALUE_Typedef Senser_Data={0};
+    MPU6050value_typedef Senser_Data={0};
     unsigned char tmp[6]={0};
 
     MPU6050_read(ACCEL_XOUT_H,&tmp[0],1);
@@ -325,13 +338,19 @@ FINSH_FUNCTION_EXPORT(rd_simpu, read mpu6050 data in single reg .)
 
 void rd_mpu(void)
 {
-    MPU6050AGVALUE_Typedef Senser_Data;
-
+    MPU6050value_typedef Senser_Data;
+    MPU6050value_typedef test_Data;
+    
     Read_MPU6050AG(&Senser_Data);
     
     rt_kprintf("Accel_X :%d   ,Accel_Y :%d   ,Accel_Z :%d\n",Senser_Data.AccelX,Senser_Data.AccelY,Senser_Data.AccelZ);
     rt_kprintf("Gyro_X :%d    ,Gyro :%d      ,Gyro :%d\n"   ,Senser_Data.GYROX, Senser_Data.GYROY, Senser_Data.GYROZ);
     rt_kprintf("Temperature :%d \n",Senser_Data.TEMPER);
+
+//    get_MPU6050(&test_Data);
+//    rt_kprintf("Accel_X :%d   ,Accel_Y :%d   ,Accel_Z :%d\n",test_Data.AccelX,test_Data.AccelY,test_Data.AccelZ);
+//    rt_kprintf("Gyro_X :%d    ,Gyro :%d      ,Gyro :%d\n"   ,test_Data.GYROX, test_Data.GYROY, test_Data.GYROZ);
+//    rt_kprintf("Temperature :%d \n",test_Data.TEMPER);
 }
 #ifdef RT_USING_FINSH
 #include <finsh.h>

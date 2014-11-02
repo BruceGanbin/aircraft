@@ -76,7 +76,6 @@ static void at_thread(void* parameter)
         if(result_sem == RT_EOK)
         {
             memset(rx_buf.uart_rx_buffer,0,AT_BUF_MAX);
-//          rt_kprintf("clean uart_buff \n");
             rx_buf.size = 0;
         }
 
@@ -109,9 +108,9 @@ void at_application_init(void)
     rx_mq = rt_mq_create("btrx_mq", sizeof(struct rx_msg), 5, RT_IPC_FLAG_FIFO);
     RT_ASSERT(rx_mq != RT_NULL);
 
-    rt_thread_t thread = rt_thread_create("at_cmd",
+    rt_thread_t thread = rt_thread_create("serial2",
                                           at_thread, RT_NULL,
-                                          1024, 25, 7);
+                                          1024, 15, 5);
 
     if(thread != RT_NULL)
     {
