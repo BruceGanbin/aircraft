@@ -79,7 +79,7 @@ unsigned char BT_parse(char *dat,rt_size_t num)
     unsigned char temp[BT_PADATA_LEN]={0};
     char rec[BT_PARSE_LEN]={0};
     char *srec = &rec[2];
-    MPU6050AGVALUE_Typedef agdata;
+    MPU6050value_typedef agdata;
 
     head = dat;
     rec[0] = 0x5A;
@@ -102,8 +102,7 @@ unsigned char BT_parse(char *dat,rt_size_t num)
         }    
     }
 
-    Read_MPU6050AG(&agdata);
-    
+    get_MPU6050(&agdata);
     
     /* receive is data  */
     if(link_st == BT_LINK_UP)
@@ -400,7 +399,7 @@ void BT_thread_init(void *parameter)
             BT_parse(rx_buf.uart_rx_buffer,rx_buf.size);
             rt_sem_release(BT_sem);
             result = !RT_EOK;
-            rt_thread_delay(5);
+            rt_thread_delay(1);
         }
     }
      

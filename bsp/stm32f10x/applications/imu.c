@@ -3,7 +3,6 @@
 
 float q0=1,q1=0,q2=0,q3=0;
 float exInt=0,eyInt=0,ezInt=0;
-
 float imu_pitch=0,imu_roll=0,imu_yaw=0;
 
 float B1_quad_Kp=0;
@@ -80,3 +79,11 @@ unsigned char IMU_Update(float ax,float ay,float az,float gx,float gy,float gz)
 
     return 1;
 }
+
+void get_euler(float *roll,float *pitch,float *yaw)
+{
+    *roll = imu_roll;
+    *pitch = imu_pitch;
+    *yaw = imu_yaw;
+}
+

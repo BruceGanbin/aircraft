@@ -4,7 +4,10 @@
 
 
 unsigned int T_count=0;
+unsigned int M_count=0;
+unsigned char T_st = 0;
 
+static rt_sem_t T_sem = RT_NULL;
 
 void TIM5_IRQHandler(void)
 {
@@ -12,6 +15,7 @@ void TIM5_IRQHandler(void)
     {
         TIM_ClearITPendingBit(TIM5,TIM_FLAG_Update);
         ++T_count;
+        rt_sem_release(T_sem);
     }
 }
 
@@ -33,26 +37,38 @@ void TIME5_NVIC_Configuration(void)
 {  
     NVIC_InitTypeDef NVIC_InitStructure;
     NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
 
 void imu_thread(void *parameter)
 {
+    int i;
+    rt_err_t result;
 
+    //    rt_sem_release(T_sem);
     while(1)
     {
-        rt_thread_delay(10);
+        result = rt_sem_take(T_sem,RT_WAITING_FOREVER);
+        if(result != RT_EOK)
+        {
+            rt_kprintf("not get sem\n");
+            return;
+        }
+        ++M_count;
+        
+        //        IMU_Update()
     }
 }
 
-rt_time_t print_timer;
+rt_timer_t print_timer;
 void imupr_timer(void* parameter)
 {
     static unsigned long pcount = 0;
-    ++pcount;
-    rt_kprintf("count:%d",pcount);
+
+    rt_kprintf("T_count:%d   M_count%d \n",T_count,M_count);
     //    rt_kprintf("roll:%d.%d      pitch:%d.%d      yaw:%d.%d\n",);
  }
 
@@ -64,18 +80,22 @@ void imu_application_init(void)
     TIME5_NVIC_Configuration();
 
     imu_tid = rt_thread_create("imu_app",
-                                  imu_thread, RT_NULL,
-                                  2048, 5, 1);
+                               imu_thread, RT_NULL,
+                               2048, 13, 1);
     if(imu_tid != RT_NULL)
     {
         rt_thread_startup(imu_tid);
     }
     
     print_timer = rt_timer_create("print_imu",
-                                 imupr_timer,
-                                 RT_NULL,
-                                 100,
-                                 RT_TIMER_FLAG_PERIODIC);
+                                  imupr_timer,
+                                  RT_NULL,
+                                  100,
+                                  RT_TIMER_FLAG_PERIODIC);
+
+    T_sem = rt_sem_create("imu_sem",0,RT_IPC_FLAG_FIFO);
+    RT_ASSERT(T_sem != RT_NULL);
+
 }
 
 
